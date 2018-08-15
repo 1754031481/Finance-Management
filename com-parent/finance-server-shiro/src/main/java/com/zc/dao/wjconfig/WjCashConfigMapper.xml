@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.wjconfig.WjCashConfigMapper">
+
+    <sql id="baseSelect">
+		SELECT
+	  id, create_user, created_ip,
+      created_time, update_time, name,
+      method, merchant_no, card_type,
+      bank_account_type, order_subject, notify_url,
+      public_key, request_adress_df, query_address
+	</sql>
+
+
+    <select id="findWjCashConfig" resultType="map">
+        <include refid="baseSelect"/>  FROM wj_cash_config   ORDER BY created_time DESC
+    </select>
+
+    <select id="findConfig" resultType="Map" parameterType="com.zc.entity.wjconfig.WjCashConfig">
+       SELECT id,notify_url,public_key,request_adress_df,query_address FROM wj_cash_config  WHERE  id = #{WjCashId}
+    </select>
+
+
+    <update id="updateWjCashConfig" parameterType="com.zc.entity.wjconfig.WjCashConfig">
+       UPDATE wj_cash_config
+        <set>
+            <if test="name != null">name=#{name},</if>
+            <if test="method != null">method=#{method},</if>
+            <if test="merchantNo != null">merchant_no=#{merchantNo},</if>
+            <if test="cardType != null">card_type=#{cardType},</if>
+            <if test="bankAccountType != null">bank_account_type=#{bankAccountType},</if>
+            <if test="orderSubject != null">order_subject=#{orderSubject},</if>
+            <if test="notifyUrl != null">notify_url=#{notifyUrl},</if>
+            <if test="publicKey != null">public_key=#{publicKey},</if>
+            <if test="requestAdressDf != null">request_adress_df=#{requestAdressDf},</if>
+            <if test="queryAddress != null">query_address=#{queryAddress},</if>
+        </set>
+        WHERE   id = #{id}
+    </update>
+    
+    <insert id="addWjCashConfig"  parameterType="com.zc.entity.wjconfig.WjCashConfig" >
+        INSERT INTO wj_cash_config ( created_time,update_time,name,method,merchant_no,card_type,bank_account_type,order_subject,notify_url,
+                    public_key,request_adress_df,query_address)
+        VALUES (#{createdTime},#{updateTime},#{name},#{method},#{merchantNo},#{cardType},#{bankAccountType},#{orderSubject},#{notifyUrl},#{publicKey},
+                 #{requestAdressDf},#{queryAddress});
+    </insert>
+
+</mapper>

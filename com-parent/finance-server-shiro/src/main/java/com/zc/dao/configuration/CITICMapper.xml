@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.configuration.CITICMapper">
+
+    <!--获取中信扫码渠道列表-->
+    <select id="getQRcodeList" resultType="com.zc.vo.configuration.CITICQRcodeVO">
+        SELECT id, mch_id AS merchantId, notify_url AS notifyUrl,
+        public_keys AS publicKey, root_url AS rootUrl, service AS serviceType
+        FROM zx_bank_nativa
+        ORDER BY created_time DESC
+    </select>
+
+    <!--修改中信扫码渠道-->
+    <update id="updateQRcode" parameterType="com.zc.entity.configuration.CITICQRcode">
+        UPDATE zx_bank_nativa
+        SET update_time = NOW(), mch_id = #{merchantId}, notify_url = #{notifyUrl}, public_keys = #{publicKey},
+        root_url = #{rootUrl}, service = #{serviceType}
+        WHERE id = #{id}
+    </update>
+
+
+</mapper>

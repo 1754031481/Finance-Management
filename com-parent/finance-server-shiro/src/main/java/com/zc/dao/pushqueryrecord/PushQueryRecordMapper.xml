@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.pushqueryrecord.PushQueryRecordMapper">
+
+
+    <sql id="baseSelect">
+        SELECT
+        id,
+        DATE_FORMAT(created_time,'%Y-%m-%d %H:%i:%s') created_time,
+        created_ip,
+        descibe,
+        convert(money,decimal)/100 money,
+        order_num,
+        pay_status,
+        pay_type,
+        system_from_name,
+        system_name,
+        third_pay_type,
+        third_status
+    </sql>
+
+
+    <select id="findOrderList" resultType="Map">
+    <include refid="baseSelect"/> from push_query_record
+    <where>
+
+        <if test="orderNum != null">
+            and  order_num = #{orderNum}
+        </if>
+        <if test="thirdPayType != null">
+            and third_pay_type = #{thirdPayType}
+        </if>
+        <if test="createdTime != null">
+            and created_time &gt;= #{createdTime}
+        </if>
+        <!-- <if test="updateTime != null">
+             and update_time &lt;= #{updateTime}
+         </if>-->
+        <if test="systemFromName != null">
+            and system_from_name = #{systemFromName}
+        </if>
+
+    </where>
+    ORDER BY created_time DESC
+</select>
+
+    <select id="selectId" resultType="java.lang.String">
+        <include refid="baseSelect"/> from push_query_record
+        <where>
+            <if test="orderNum != null">
+                and  order_num = #{orderNum}
+            </if>
+            <if test="thirdPayType != null">
+                and third_pay_type = #{thirdPayType}
+            </if>
+            <if test="createdTime != null">
+                and created_time &gt;= #{createdTime}
+            </if>
+            <!-- <if test="updateTime != null">
+                 and update_time &lt;= #{updateTime}
+             </if>-->
+            <if test="systemFromName != null">
+                and system_from_name = #{systemFromName}
+            </if>
+
+        </where>
+        ORDER BY created_time DESC
+    </select>
+
+
+    <!--根据id列表批量查询-->
+    <select id="getBatchQuery" resultType="com.zc.entity.pushqueryrecord.PushQueryRecord">
+        SELECT
+        push_query_record.id AS id,
+        push_query_record.created_ip AS createdIp,
+        push_query_record.created_time AS createdTime,
+        push_query_record.descibe AS descibe,
+        push_query_record.money AS money ,
+        push_query_record.order_num AS orderNum,
+        push_query_record.pay_status AS payStatus,
+        push_query_record.pay_type AS payType,
+        push_query_record.system_from_name AS systemFromName,
+        push_query_record.system_name AS systemName,
+        push_query_record.third_pay_type AS thirdPayType,
+        push_query_record.third_status AS thirdStatus
+        FROM
+        push_query_record
+        WHERE id in
+        <foreach collection="dramaIds" item="dramaId" open="(" close=")" separator=",">
+            #{dramaId}
+        </foreach>
+    </select>
+    <select id="getChannelSel" resultType="java.lang.String">
+        select `name` from interface_entity  WHERE  type = 1
+    </select>
+</mapper>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.xsconfig.XSCashMapper">
+
+   <!-- 获取列表数据 -->
+    <select id="getXsCashList" resultType="com.zc.entity.xsconfig.XSCashConfig">
+        select
+        id,
+        alias,
+        charset,
+        mer_id as merId,
+        `name`,
+        notify_url as notifyUrl,
+        pay_type as payType,
+        payee_type as payeeType,
+        private_url as privateUrl,
+        public_key as publicKey,
+        pwd,
+        query_url as queryUrl,
+        root_url as rootUrl,
+        sign_type as signType,
+        storepass,
+        tran_code as tranCode,
+        tran_code_query as tranCodeQuery,
+        version
+        from xs_cash_config
+        order by created_time desc
+    </select>
+
+    <!--回显-->
+    <select id="getXsCashById" parameterType="java.lang.Long" resultType="com.zc.entity.xsconfig.XSCashConfig">
+        select
+        id,
+        alias,
+        charset,
+        mer_id as merId,
+        `name`,
+        notify_url as notifyUrl,
+        pay_type as payType,
+        payee_type as payeeType,
+        private_url as privateUrl,
+        public_key as publicKey,
+        pwd,
+        query_url as queryUrl,
+        root_url as rootUrl,
+        sign_type as signType,
+        storepass,
+        tran_code as tranCode,
+        tran_code_query as tranCodeQuery,
+        version
+        from xs_cash_config
+        where id=#{id}
+        limit 1
+    </select>
+
+    <update id="updateXsCash" parameterType="com.zc.entity.xsconfig.XSCashConfig">
+        update xs_cash_config
+        set
+        alias=#{alias},
+        charset=#{charset},
+        mer_id=#{merId},
+        `name`=#{name},
+        notify_url=#{notifyUrl},
+        pay_type=#{payType},
+        payee_type=#{payeeType},
+        private_url=#{privateUrl},
+        public_key=#{publicKey},
+        pwd=#{pwd},
+        query_url=#{queryUrl},
+        root_url=#{rootUrl},
+        sign_type=#{signType},
+        storepass=#{storepass},
+        tran_code=#{tranCode},
+        tran_code_query=#{tranCodeQuery},
+        version=#{version},
+        update_time=now()
+        where id=#{id}
+    </update>
+
+    <!--获取支持项目下拉框-->
+    <select id="getSelect" resultType="com.zc.vo.SystemFromVO">
+        select `id`,`name` from system_from
+    </select>
+</mapper>

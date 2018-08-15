@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.push.CashOrderMapper">
+
+    <!--获取关于推送代付订单列表-->
+    <select id="getList" resultType="com.zc.entity.push.PushTask" parameterType="com.zc.entity.push.PushTask">
+        SELECT id, ayn_url AS aynUrl, batch_no AS batchNo, descibe,cast(money/100 as decimal(15,2)) AS money , order_num AS orderNum,
+        other_no AS otherNo, pay_status AS payStatus, pay_type AS payType, send_count AS sendCount,
+        system_from_name AS systemFromName, system_name AS systemName, third_pay_type AS thirdPayType, state
+        FROM `push_task`
+        WHERE 1 = 1
+        <if test="systemName != null">
+            AND system_name = #{systemName}
+        </if>
+        <if test="orderNum != null">
+            AND order_num = #{orderNum}
+        </if>
+        ORDER BY created_time DESC
+    </select>
+
+    <!--修改关于推送代付订单-->
+    <update id="update" parameterType="com.zc.entity.push.PushTask">
+        UPDATE push_task
+        SET update_time = NOW(), ayn_url = #{aynUrl}, batch_no = #{batchNo}, descibe = #{descibe}, money = #{money},
+        order_num = #{orderNum}, other_no = #{otherNo},
+        pay_status = #{payStatus},pay_type = #{payType}, send_count = #{sendCount},
+        system_from_name = #{systemFromName},system_name = #{systemName}, third_pay_type = #{thirdPayType},state = #{state}
+        WHERE id = #{id}
+    </update>
+
+
+    <!--获取关于推送代付订单下拉列表-->
+    <select id="selectSystemFromName" resultType="com.zc.vo.push.CashSystemFromSelectDTO">
+        SELECT id, system_from_name AS systemFromName,`name` AS systemName
+        FROM `system_from`
+        ORDER BY created_time DESC
+    </select>
+</mapper>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.interfaceentity.InterFaceEntityMapper">
+
+    <sql id="baseSelect">
+      SELECT
+      id,
+      name,
+      type,
+      support_statue,
+      address,
+      channel_public_key,
+      address_return,
+      is_shunting,
+      IFNULL(week_limit_money,"") as week_limit_money,
+      weight,
+      IFNULL(day_limit_money,"") as day_limit_money,
+      is_shunting_cash,
+      weight_cash,
+      IFNULL(crs_task_address,"") as crs_task_address,
+      IFNULL(return_address,"") as returnAddress
+    </sql>
+
+    <select id="getInterfaceBythirdPayType" resultType="com.zc.entity.interfaceentity.InterfaceEntity">
+
+      SELECT
+      id,
+      name,
+      type,
+      support_statue supportStatue,
+      address,
+      channel_public_key channelPublicKey,
+      address_return addressReturn,
+      is_shunting isShunting,
+      week_limit_money weekLimitMoney,
+      weight,
+      day_limit_money DayLimitMoney,
+      is_shunting_cash isShuntingCash,
+      weight_cash weightCash,
+      crs_task_address crsTaskAddress
+       FROM interface_entity WHERE name = #{cashName}
+    </select>
+
+    <select id="findInterFaceList" resultType="java.util.Map">
+        <include refid="baseSelect"/>
+        FROM interface_entity
+        <if test="type != null">where type=#{type}</if>
+        ORDER BY created_time DESC
+    </select>
+
+
+    <update id="updateInterFace" parameterType="com.zc.entity.interfaceentity.InterfaceEntity">
+        UPDATE interface_entity
+        <set>
+            <if test="name != null">name=#{name},</if>
+            <if test="type != null">type=#{type},</if>
+            <if test="supportStatue != null">support_statue=#{supportStatue},</if>
+            <if test="address != null">address=#{address},</if>
+            <if test="addressReturn != null">address_return=#{addressReturn},</if>
+            <if test="isShunting != null">is_shunting=#{isShunting},</if>
+            <if test="weekLimitMoney != null">week_limit_money=#{weekLimitMoney},</if>
+            <if test="weight != null">weight=#{weight},</if>
+            <if test="DayLimitMoney != null">day_limit_money=#{DayLimitMoney},</if>
+            <if test="isShuntingCash != null">is_shunting_cash=#{isShuntingCash},</if>
+            <if test="weightCash != null">weight_cash=#{weightCash},</if>
+            <if test="crsTaskAddress != null">crs_task_address=#{crsTaskAddress},</if>
+            <if test="channelPublicKey != null">channel_public_key=#{channelPublicKey},</if>
+            <if test="returnAddress != null">return_address=#{returnAddress}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <select id="findPayConfigId" resultType="Map"  parameterType="java.lang.String" statementType="STATEMENT">
+        select *  FROM ${interFaceName}
+    </select>
+
+    <select id="selectFinalChannel" parameterType="java.lang.String" resultType="java.lang.String">
+        select `name` from interface_entity where
+        <if test='type=="0"'> is_shunting='final'</if>
+        <if test='type=="1"'> is_shunting_cash='final'</if>
+    </select>
+
+    <update id="reducePayFinalChannel" parameterType="java.lang.Integer">
+        update interface_entity set is_shunting='false', update_time=now() where `type`=0 and is_shunting='final'
+    </update>
+
+    <update id="reduceCashFinalChannel" parameterType="java.lang.Integer">
+        update interface_entity set is_shunting_cash='false',update_time=now() where `type`=1 and is_shunting_cash='final'
+    </update>
+</mapper>

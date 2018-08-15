@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.wconfig.WPayConfigMapper">
+
+    <sql id="baseSelect">
+		SELECT
+	  id, create_user, created_ip,
+      created_time, update_time, mer_url,
+      merchant_no, method, name,
+      page_url, private_key, public_key,
+      w_getway_url_df, w_getway_url_zf
+	</sql>
+
+
+    <select id="findWPayConfig" resultType="map">
+        <include refid="baseSelect"/>  FROM w_pay_config   ORDER BY created_time DESC
+    </select>
+
+    <select id="findConfig" resultType="Map" parameterType="com.zc.entity.wconfig.WPayConfig">
+       SELECT id,mer_url,page_url,private_key,public_key,w_getway_url_df,w_getway_url_zf FROM w_pay_config  WHERE  id = #{WPayId}
+    </select>
+
+
+    <update id="updateWPayConfig" parameterType="com.zc.entity.wconfig.WPayConfig">
+       UPDATE w_pay_config
+        <set>
+            <if test="merUrl != null">mer_url=#{merUrl},</if>
+            <if test="merchantNo != null">merchant_no=#{merchantNo},</if>
+            <if test="method != null">method=#{method},</if>
+            <if test="name != null">name=#{name},</if>
+            <if test="pageUrl != null">page_url=#{pageUrl},</if>
+            <if test="privateKey != null">private_key=#{privateKey},</if>
+            <if test="publicKey != null">public_key=#{publicKey},</if>
+            <if test="wGetwayUrlDf != null">w_getway_url_df=#{wGetwayUrlDf},</if>
+            <if test="wGetwayUrlZf != null">w_getway_url_zf=#{wGetwayUrlZf},</if>
+
+        </set>
+        WHERE   id = #{id}
+    </update>
+    
+    <insert id="addWPayConfig"  parameterType="com.zc.entity.wconfig.WPayConfig" >
+        INSERT INTO w_pay_config ( created_time,update_time,mer_url,merchant_no,method,name,page_url,private_key,public_key,w_getway_url_df,w_getway_url_zf)
+        VALUES (#{createdTime},#{updateTime},#{merUrl},#{merchantNo},#{method},#{name},#{pageUrl},#{privateKey},#{publicKey},#{wGetwayUrlDf},#{wGetwayUrlZf});
+    </insert>
+
+</mapper>

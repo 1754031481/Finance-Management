@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.pushupload.PushUploadMapper">
+
+   <!-- 获取推送地址 -->
+    <select id="getPushUrl" resultType="java.lang.String" parameterType="java.lang.String">
+        select CONCAT(sf.system_from_ayn_url,cpc.ayn_url) as pushUrl from cash_receive_station crs
+        left join system_from sf on crs.from_system=sf.system_from_name
+        left join interface_entity ie on sf.third_pay_type_cash=ie.`name`
+        left join third_pay_type tpt on tpt.system_from_id=sf.id and tpt.inter_face_id=ie.id
+        left join common_pay_config cpc on cpc.id=tpt.common_pay_config_id
+        where crs.mer_seq_id=#{businessnumber}
+    </select>
+
+    <!-- 获取提现记录表 -->
+    <select id="getCashReceiveStationByMerSeqId" parameterType="java.lang.String" resultType="com.zc.entity.cashreceivestation.CashReceiveStation">
+        select
+        id,
+        from_system as fromSystem,
+        third_pay_type as thirdPayType,
+        status
+        from cash_receive_station crs
+        where crs.mer_seq_id=#{businessnumber}
+    </select>
+
+    <select id="findPayEntity" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(1) from push_task p where p.order_num=#{businessnumber}
+    </select>
+
+    <select id="getPayEntity" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(1) from push_task_record p where p.order_num=#{businessnumber}
+    </select>
+
+    <!-- 保存支付记录 -->
+    <insert id="savePayContext" parameterType="com.zc.entity.paycontext.PayContext" keyProperty="id" useGeneratedKeys="true">
+        insert into pay_context(ayn_url,money,created_time,order_num,from_system,syn_return_context,update_time,
+        third_pay_type,current_describe,pay_status) values(#{aynUrl},#{money},#{createdTime},#{orderNum},
+        #{fromSystem},#{synReturnContext},#{updateTime},#{thirdPayType},#{currentDescribe},#{payStatus})
+    </insert>
+
+    <!-- 删除提现记录 -->
+    <delete id="deleteCashReceiveStation" parameterType="java.lang.Long">
+        delete from cash_receive_station where id=#{id}
+    </delete>
+
+    <!-- 修改提现记录状态 -->
+    <update id="updateCashReceiveStationStatus" parameterType="com.zc.entity.cashreceivestation.CashReceiveStation">
+        update cash_receive_station set status=#{status} where id=#{id}
+    </update>
+
+    <!-- 保存推送 -->
+    <insert id="savePushTask" parameterType="com.zc.entity.push.PushTask" keyProperty="id" useGeneratedKeys="true">
+        insert into push_task(ayn_url,batch_no,created_time,descibe,money,order_num,pay_status,pay_type,system_from_name,system_name,third_pay_type,update_time)
+        values(#{aynUrl},#{batchNo},#{createdTime},#{descibe},#{money},#{orderNum},#{payStatus},#{payType},#{systemFromName},#{systemName},#{thirdPayType},#{updateTime})
+    </insert>
+
+    <!-- 获取用户otp -->
+    <select id="getOtpByTel" parameterType="java.lang.String" resultType="java.lang.String">
+        select otp_code from alq_permission_common_user where telphone=#{tel}
+    </select>
+</mapper>

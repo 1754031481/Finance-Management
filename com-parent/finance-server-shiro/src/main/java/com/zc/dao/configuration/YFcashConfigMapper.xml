@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.configuration.YFcashConfigMapper">
+
+    <!--获取裕福渠道代付配置列表-->
+    <select id="getList" resultType="com.zc.entity.configuration.YFCashConfig">
+        SELECT id, back_file_path AS backFilePath, back_url AS backUrl, batch_pay_file_digest AS batchPayFileDigest,
+        batch_pay_file_name AS batchPayFileName, batch_pay_file_path AS batchPayFilePath, merchant_id AS merchantId,
+        merchant_order_time AS merchantOrderTime, query_dwon_url AS queryDwonUrl, query_task_url AS queryTaskUrl,
+        query_url AS queryUrl, request_url AS requestUrl, private_sign AS privateSign,yufucerp_address AS yufucerpAddress,
+        yufucerp_path AS yufucerpPath, money_id AS moneyId, version
+        FROM `yf_cash_config`
+        ORDER BY created_time DESC
+    </select>
+
+    <!--修改裕福渠道代付配置-->
+    <update id="update" parameterType="com.zc.entity.configuration.YFCashConfig">
+        UPDATE yf_cash_config
+        SET update_time = NOW(), back_file_path = #{backFilePath}, back_url = #{backUrl}, batch_pay_file_digest = #{batchPayFileDigest}, batch_pay_file_name = #{batchPayFileName},
+        batch_pay_file_path = #{batchPayFilePath}, merchant_id = #{merchantId},
+        merchant_order_time = #{merchantOrderTime},query_dwon_url = #{queryDwonUrl}, query_task_url = #{queryTaskUrl},
+        query_url = #{queryUrl},request_url = #{requestUrl}, private_sign = #{privateSign},yufucerp_address = #{yufucerpAddress},
+        yufucerp_path = #{yufucerpPath},money_id = #{moneyId},version = #{version}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

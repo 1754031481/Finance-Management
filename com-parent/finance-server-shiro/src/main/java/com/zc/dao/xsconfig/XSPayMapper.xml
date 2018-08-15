@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.xsconfig.XSPayMapper">
+
+   <!-- 获取列表数据 -->
+    <select id="getXsPayList" resultType="com.zc.entity.xsconfig.XSPayConfig">
+        select
+        id,
+        alias,
+        charset,
+        currency_code as currencyCode,
+        direct_flag as directFlag,
+        identity_type as identityType,
+        mer_id as merId,
+        `name`,
+        pay_type as payType,
+        private_url as privateUrl,
+        puliic_key as puliicKey,
+        pwd,
+        query_url as queryUrl,
+        req_type as reqType,
+        req_url as reqUrl,
+        ret_url as retUrl,
+        root_url as rootUrl,
+        sign_type as signType,
+        storepass,
+        tran_type as tranType,
+        `type`,
+        version
+        from xs_pay_config
+        order by created_time desc
+    </select>
+
+    <!--回显-->
+    <select id="getXsPayById" parameterType="java.lang.Long" resultType="com.zc.entity.xsconfig.XSPayConfig">
+          select
+        id,
+        alias,
+        charset,
+        currency_code as currencyCode,
+        direct_flag as directFlag,
+        identity_type as identityType,
+        mer_id as merId,
+        `name`,
+        pay_type as payType,
+        private_url as privateUrl,
+        puliic_key as puliicKey,
+        pwd,
+        query_url as queryUrl,
+        req_type as reqType,
+        req_url as reqUrl,
+        ret_url as retUrl,
+        root_url as rootUrl,
+        sign_type as signType,
+        storepass,
+        tran_type as tranType,
+        `type`,
+        version
+        from xs_pay_config
+        where id=#{id}
+        limit 1
+    </select>
+
+    <update id="updateXsPay" parameterType="com.zc.entity.xsconfig.XSPayConfig">
+        update xs_pay_config
+        set
+        alias=#{alias},
+        charset=#{charset},
+        currency_code=#{currencyCode},
+        direct_flag=#{directFlag},
+        identity_type=#{identityType},
+        mer_id=#{merId},
+        `name`=#{name},
+        pay_type=#{payType},
+        private_url=#{privateUrl},
+        puliic_key=#{puliicKey},
+        pwd=#{pwd},
+        query_url=#{queryUrl},
+        req_type=#{reqType},
+        req_url=#{reqUrl},
+        ret_url=#{retUrl},
+        root_url=#{rootUrl},
+        sign_type=#{signType},
+        storepass=#{storepass},
+        tran_type=#{tranType},
+        `type`=#{type},
+        version=#{version},
+        update_time=now()
+        where id=#{id}
+    </update>
+
+    <!--获取支持项目下拉框-->
+    <select id="getSelect" resultType="com.zc.vo.SystemFromVO">
+        select `id`,`name` from system_from
+    </select>
+</mapper>

@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+
+<head>
+    <meta charset="UTF-8">
+    <title>待发起订单列表</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common/models.css}">
+    <!--bootstrap-select  css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/bootstrapselect/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/bootstrapselect/css/bootstrap-select.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/datepicker/css/jquery-ui-timepicker-addon.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/datepicker/css/jedate.css}"/>
+    <!--文件树插件 css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/ztree/zTreeStyle.css}">
+    <style>
+        #filename {
+            width: 67px !important;
+        }
+
+        #SWFUpload_0 {
+            width: 67px !important;
+        }
+
+        #filename-button {
+            background-repeat: no-repeat;
+            width: 67px !important;
+        }
+
+       /* th{
+            height: 44px;
+            line-height: 22px;
+            text-align: center;
+            border:  1px solid #ddd;
+            border-bottom: none;
+            font-size: 14px;
+            color: #555555;
+            !*vertical-align: middle;*!
+        }
+        td{
+            height: 44px;
+            line-height: 22px;
+            text-align: center;
+            border:  1px solid #ddd;
+            font-size: 14px;
+            color: #555555;
+            !*vertical-align: middle;*!
+        }
+
+        .dataTables_paginate{
+            !*margin-top: 15px;*!
+            margin-right: 18px;
+        }
+        .dataTables_info{
+            !*margin-top: 14px;*!
+            !*margin-right: 160px;*!
+        }
+        .dataTables_scrollBody{
+            table-layout: fixed;
+            margin: 0px auto 0px 0px;
+            top:-20px;
+        }
+        !*.dataTables_scrollHead{*!
+        !*left:86px;*!
+        !*top:15px;*!
+        !*}*!
+        #tableArea table{
+            width: 1523px;
+        }*/
+    </style>
+
+
+</head>
+<body>
+<div class="MainContent">
+    <!--面包屑-->
+    <div class="current">当前位置：<a href="#">特殊订单处理</a>&nbsp;&gt;&nbsp;<span>待发起订单列表</span></div>
+    <!--end 面包屑-->
+    <!--主体内容-->
+    <div class="MainCont">
+        <!--标题-->
+
+        <div class="ph_subTit">
+            <h2>待发起订单列表</h2>
+        </div>
+
+        <form id="queryForm">
+            <div class="ph_screen">
+                <table class="ph_tableBox">
+                    <tr>
+                        <th>发起来源：</th>
+                        <td><select  id="querySystemFrom" name="querySystemFrom"></select></td>
+                        </select></td>
+                        <th>收款人姓名：</th>
+                        <td><input  id="queryPersonName" name="queryPersonName" type="text" style="width: 260px;height:40px "></td>
+                        <th>订单号：</th>
+                        <td><input type="text" id="queryOrderNum" name="queryOrderNum" style="width: 260px;height:40px "></td>
+                        <td> <input name="" type="button" onclick="query();" value="查询">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <input name="" type="button" onclick="reset();" value="重置"></td>
+                    </tr>
+                </table>
+            </div>
+        </form>
+
+        <!--end 标题-->
+        <!--代发起订单列表-->
+        <div class="ph_wareBox">
+            <table class="ph_wareList" id="example"></table>
+        </div>
+
+
+       <!-- <div class="" id="tableArea" >
+            <table class="" id="example" border="1"  style="height: 45px; margin-top: 20px;"></table>
+        </div>-->
+        <!--end 代发起订单列表-->
+    </div>
+    <!--end 主体内容-->
+</div>
+
+
+<!--修改弹窗-->
+<div class="PopupBox" id="addLinkmanBox">
+    <!--关闭按钮-->
+    <a href="javascript: void(0);" class="close"></a>
+    <!--end 关闭按钮-->
+    <!--内容-->
+    <div class="PopupCon">
+        <div class="ph_subPoCon ph_screen">
+            <form class="form-inline" id="addLogisticForm">
+                <table class="ph_tableBox">
+                    <input id="id" name="id" hidden="hidden"/>
+                    <tr>
+                        <th>订单时间：</th>
+                        <td>
+                            <div class="jeinpbox"><input type="text" class="jeinput" id="createdTime" name="createdTime" placeholder="YYYY-MM-DD hh:mm:ss"></div>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>金额：</th>
+                        <td><input name="money" type="text" id="money"
+                                   class="validate[required,custom[number],funcCall[secondMoney]]"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>银行名称：</th>
+                        <td><input name="bankName" type="text" id="bank_name"
+                                   class="validate[required,min[1],maxSize[50]"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>银行卡号：</th>
+                        <td><input name="cardNo" type="text" id="card_no"
+                                   class="validate[required,min[1],maxSize[100]"></td>
+                    </tr>
+
+                    <tr>
+                        <th><span class="require">*</span>收款人名称：</th>
+                        <td><input name="personName" type="text" id="person_name"
+                                   class="validate[required,min[1],maxSize[100]"></td>
+                    </tr>
+
+                </table>
+            </form>
+        </div>
+
+    </div>
+    <!--end 内容-->
+</div>
+
+
+    <!--end 内容-->
+</div>
+<!--end查看弹窗-->
+
+
+<!--遮罩层-->
+<div class="maskBox"></div>
+</div>
+
+<!--操作框 -->
+<div id="handle">
+</div>
+<!--end 操作框-->
+
+<script type="text/javascript" th:src="@{/js/common/jquery-1.11.1.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/common/index.js}"></script>
+<!--bootstrap-select-->
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/bootstrap-select.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/select.js}"></script>
+<!--分页-->
+<script type="text/javascript" th:src="@{/js/plugins/pages/jquery.dataTables.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/layer/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/spm/spmExtends.js}"></script>
+<!--bootstrap-select-->
+!--日期控件-->
+<script type="text/javascript" th:src="@{/js/plugins/datepicker/bootstrap-datepicker.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/datepicker/jquery.timepicker.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/datepicker/jquery.datepair.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/datepicker/datepicker.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/datepicker/jedate.js}"></script>
+<!--<script type="text/javascript" th:src="@{/js/plugins/datepicker/jquery-ui-timepicker-zh-CN.js}"></script>-->
+<!--<script type="text/javascript" th:src="@{/js/plugins/datepicker/jquery-ui-timepicker-addon.js}"></script>-->
+<!--<script type="text/javascript" th:src="@{/js/plugins/datepicker/jquery-ui-sliderAccess.js}"></script>-->
+
+<!-- 验证 -->
+<script type="text/javascript" th:src="@{/js/plugins/validat/jquery.validationEngine.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/validat/jquery.validationEngine-zh_CN.js}"></script>
+<script type="text/javascript" th:src="@{/js/common/util.js}"></script>
+
+<!--文件树插件-->
+<!--<script type="text/javascript" th:src="@{/static/js/plugins/ztree/jquery-1.4.4.min.js}"></script>-->
+<script type="text/javascript" th:src="@{/js/plugins/ztree/jquery.ztree.core.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/ztree/jquery.ztree.excheck.min.js}"></script>
+<script type="text/javascript" th:src="@{/uploadfy/jquery.uploadify.js}"></script>
+<!--上传图片-->
+<script type="text/javascript" th:inline="javascript">
+    var tb;
+    /*var sessionUser = [[${session.login_back_session}]];*/
+
+    $(function () {
+        $.ajax({
+            type: "GET",
+            url: "/pc/view/CashReceiveStationUpdate/fromSystemList",
+            data: {
+            },
+            success: function (data) {
+                var d = $.parseJSON(data);
+                var str = '<select  id="querySystemFrom" name="querySystemFrom"><option value ="">=====请选择=====</option>';
+                $.each(d, function(i, n){
+                    str += '<option value ="'+n.fromSystem+'">'+n.name+'</option>';
+                });
+                str += '</select>';
+                $("#querySystemFrom").html(str);
+            }
+        });
+
+
+        tb = $('#example').DataTable({
+            "lengthChange": false,
+            "ordering": false,
+            "searching": false,
+            //"scrollX": true,
+            "bServerSide": true,
+            "autoWidth": false,
+            "sPaginationType": "full_numbers",
+            "bJQueryUI": true,
+            "sDom": '<"">t<"F"ip>',
+            "sAjaxSource": "/pc/view/CashReceiveStationUpdate/list", //ajax调用接口
+            "aoColumnDefs": [{sDefaultContent: '', aTargets: ['_all']}],
+            "aoColumns": [
+                {"sWidth": "50px", "sTitle": "序号", "mData": "id", "title": "id"},
+                {"sTitle": "订单号", "mData": "merSeqId", "class": "sClass"},
+                {"sTitle": "创建时间", "mData": "createdTime", "class": "sClass"},
+                {"sTitle": "金额", "mData": "money", "class": "sClass","mRender": function (data, type, full) {
+                    var text;
+                    text=(full.money / 100).toFixed(2);
+                    return text;
+                }},
+                {"sTitle": "银行名称", "mData": "bankName", "class": "sClass"},
+                {"sTitle": "银行卡号", "mData": "cardNo", "class": "sClass"},
+                {"sTitle": "收款人名称", "mData": "personName", "class": "sClass"},
+                {"sTitle": "接口类型", "mData": "thirdPayType", "class": "sClass"},
+                {"sTitle": "发起来源", "mData": "fromSystem", "class": "sClass"},
+                {
+                    "sWidth": "110px",
+                    "sTitle": "操作",
+                    "mData": "id",
+                    "sClass": "ph_tableShow",
+                    "mRender": function (data, type, full) {
+                        var text = '<li><div class="temp_data" style="display:none">'+ JSON.stringify(full) +'</div><a href="javascript:void(0);" onclick="crsupdate(this)">修改</a></li>';
+                        return text;
+                    }
+                }
+            ],
+            "oLanguage": {
+                "sProcessing": "数据加载中······",
+                "sLengthMenu": "显示 _MENU_ 条记录",
+                "sZeroRecords": "没有您要搜索的内容！",
+                "sEmptyTable": "列表中无数据存在！",
+                "sInfo": "当前显示 _START_ 到 _END_ 条数据，共 _TOTAL_ 条数据",
+                "sInfoEmpty": "显示 0 到 0 条记录",
+                "sInfoFiltered": "数据列表中共  _MAX_ 条记录",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上一页",
+                    "sNext": "下一页",
+                    "sLast": "末页"
+                }
+            },
+            "fnServerData": function (sSource, aoData, fnCallback, oSettings) {
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "GET",
+                    "async": 'false',
+                    "url": sSource,
+                    "data": {
+                        'pageNum': (aoData[3].value / aoData[4].value) + 1,
+                        'pageSize': aoData[4].value,
+                        'id': $("#id").val(),
+                        'roleName': $("#roleName").val(),
+                        'status': $('#selectStatus').val(),
+                        'systemFrom' : $("#querySystemFrom").val(),
+                        'personName' : $("#queryPersonName").val(),
+                        'orderNum' : $("#queryOrderNum").val()
+                    },
+                    "success": fnCallback
+                });
+            },
+            "fnDrawCallback": function () {
+                var api = this.api();
+                var startIndex = api.context[0]._iDisplayStart;//获取到本页开始的条数
+                api.column(0).nodes().each(function (cell, i) {
+                    cell.innerHTML = startIndex + i + 1;
+                });
+
+            }
+        });
+        //验证初始化
+        $('#addLogisticForm').validationEngine({
+            promptPosition: 'bottomLeft'
+            , autoPositionUpdate: false
+            , addPromptClass: 'formError-text'
+            , autoHidePrompt: true
+            , autoHideDelay: 3000
+            , fadeDuration: 0.3
+        });
+    });
+
+    function reset() {
+        $("#selectStatus").selectpicker('val', "");
+        $("#selectForm")[0].reset();
+
+    }
+console.log(jeDate)
+    //日期控件
+    jeDate("#createdTime",{
+        festival:true,
+        minDate:"1900-01-01",              //最小日期
+        maxDate:"2099-12-31",              //最大日期
+        method:{
+            choose:function (params) {
+                console.log(1)
+            }
+        },
+        format: "YYYY-MM-DD hh:mm:ss"
+    });
+
+
+    //修改
+    function crsupdate(self) {
+        var temp = $(self).prev(".temp_data").html()
+        var data = JSON.parse(temp);
+        $("#id").val(data.id);
+        $("#createdTime").val(data.createdTime);
+
+         var moneyy =  data.money/100;
+        $("#money").val(moneyy);
+        $("#bank_name").val(data.bankName);
+        $("#card_no").val(data.cardNo);
+        $("#person_name").val(data.personName);
+
+        layer.open({
+            type: 1,
+            title: '修改待付发起列表',
+            closeBtn: 0,
+            area: ['600px', '500px'],
+            btn: ['保存', '取消'],
+            btnAlign: 'c',
+            content: $('#addLinkmanBox'),
+            btn1: function (index) {
+                var flag = $("#addLogisticForm").validationEngine("validate");
+                if (!flag) {
+                    return false;
+                }
+                var  ss = $("#money").val();
+                var aa =ss*100;
+                $("#money").val(aa);
+                $.ajax({
+                    type: "POST",
+                    url: "/pc/view/CashReceiveStationUpdate/CashReceiveStationUpdate",
+                    data: $("#addLogisticForm").serialize(),
+                    success: function (json) {
+                        d = eval("(" + json + ")");
+                        console.log(d);
+                        if (d.code == 200) {
+                            tb.draw(false);
+                            layer.alert("修改成功！", {
+                                icon: 1,
+                                title: '提示',
+                                closeBtn: 0,
+                                btnAlign: 'c'
+                            });
+                        } else {
+                            layer.alert(d.msg, {
+                                icon: 2,
+                                title: '失败',
+                                closeBtn: 0,
+                                btnAlign: 'c'
+                            });
+                        }
+                    }
+                });
+
+                $('#addLogisticForm')[0].reset()
+                layer.close(index);
+            },
+            btn2: function (index) {
+                //清空表单
+                $('#addLogisticForm')[0].reset()
+                layer.close(index);
+            }
+        });
+    }
+
+    //条件查询重新加载数据
+    function query() {
+        tb.draw();
+    }
+
+    //添加配置
+    $('.ph_snbBtn').on('click', '.Js_addLogistic', function () {
+        clearData();
+        layer.open({
+            type: 1,
+            title: '添加丰付代付配置',
+            closeBtn: 0,
+            area: ['600px', '500px'],
+            btn: ['确定', '取消'],
+            yes: function (index, layero) {
+                var flag = $("#addLogisticForm").validationEngine("validate");
+                if (flag) {
+                    var params = $("#addLogisticForm").serialize();
+                    $.ajax({
+                        url: '/pc/view/ffCashConfig/updateOrSaveFfCash',
+                        type: 'post',
+                        data: params,
+                        dataType: 'json',
+                        success: function (json) {
+//                            alert(JSON.stringify(json.code));
+                            if (json.code == 200) {
+                                tb.draw(false);
+                                layer.alert("添加成功！", {
+                                    icon: 1,
+                                    title: '提示',
+                                    closeBtn: 0,
+                                    btnAlign: 'c'
+                                });
+                            } else {
+                                layer.alert(json.msg, {
+                                    icon: 2,
+                                    title: '添加失败',
+                                    closeBtn: 0,
+                                    btnAlign: 'c'
+                                });
+                            }
+                        }
+                    })
+                    $('#addLogisticForm')[0].reset()
+                    layer.close(index);
+                }
+                btn2: function a(index) {
+                    //清空表单
+                    $('#addLogisticForm')[0].reset()
+                    layer.close(index);
+                }
+            },
+            btnAlign: 'c',
+            content: $('#addLinkmanBox')
+        });
+    });
+
+    function secondMoney(field, rules, i, options) {
+        var money = $("#money").val();
+        if(!/^\d+(\.\d{1,2})?$/.test(money)){
+            return "小数点后只保留两位";
+        }
+    }
+
+    function clearData() {
+        $("#addLogisticForm")[0].reset();
+    }
+    //鼠标悬浮，清空title所有数据
+    $("#example").on("mouseenter",".ph_tableShow",function(){
+        $(this).attr("title","")
+    })
+
+    // 原生写法 js 实现匹配空格删除
+    var mer_url = document.getElementsByTagName('input');
+    for (var i = 0; i < mer_url.length; i++) {
+        mer_url[i].onblur = function() {
+            //   console.log();
+            this.value = Trim(this.value);
+        };
+    }
+
+    // 监测空格函数 如果有空格替换成空
+    function Trim(str) {
+        return str.replace(/\s+/g,"");
+    }
+</script>
+</body>
+</html>

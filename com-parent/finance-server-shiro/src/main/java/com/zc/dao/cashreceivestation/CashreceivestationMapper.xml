@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.cashreceivestation.CashreceivestationMapper">
+
+    <sql id="baseSelect">
+		SELECT
+		id,
+		create_user createUser,
+		DATE_FORMAT(created_time,'%Y-%m-%d %H:%i:%s') createdTime,
+		update_time updateTime,
+		created_ip createdIp,
+		after_balance afterBalance,
+		approve_date approveDate,
+		audit_status auditStatus,
+		audit_time auditTime,
+		bank_abbr bankAbbr,
+		bank_city bankCity,
+		bank_name bankName,
+		bank_prv bankPrv,
+		bank_sub bankSub,
+		card_no cardNo,
+		chk_value chkValue,
+		comments,
+		css_id cssId,
+		css_type cssType,
+		current_balance currentBalance,
+		current_describe currentDescribe,
+		describer ,
+		fee_income feeIncome,
+		from_system fromSystem,
+		mer_date merDate,
+		mer_seq_id merSeqId,
+		money,
+		name,
+		ora_name oraName,
+		ora_status oraStatus,
+		person_name personName,
+		person_no personNo,
+		sign_date signDate,
+		status,
+		system_role systemRole,
+		tel,
+		third_pay_type thirdPayType,
+		versionid ,
+		notify_url notifyUrl,
+		title,
+		crs_task_address crsTaskAddress
+	</sql>
+
+    <select id="findCashReceiveStation" resultType="map" >
+        <include refid="baseSelect"/>  FROM cash_receive_station
+        WHERE 1=1
+        <if test="systemFrom != null">
+        AND from_system = #{systemFrom}
+        </if>
+        <if test="personName != null">
+        AND person_name = #{personName}
+        </if>
+        <if test="orderNum  != null">
+        AND mer_seq_id =  #{orderNum}
+        </if>
+        ORDER BY created_time DESC
+    </select>
+
+    <!--序号，项目名称，代付渠道，可发起提现总金额，可发起提现订单数，今日提现总金额。今日提现订单数，操作-->
+    <select id="findBusinessChannelsList" resultType="map">
+        SELECT
+        s.NAME name,
+        s.third_pay_type_cash thirdPayTypeCash,
+        s.system_from_name systemFromName,
+        (
+        SELECT
+        ROUND(IFNULL(sum(t.money),0)/100,2)
+        FROM
+        cash_receive_station t
+        WHERE
+        t.from_system = s.system_from_name
+        AND t.status in('1','3','4')
+        AND created_time &lt; #{date}
+        ) money,
+        (
+        SELECT
+        count(1)
+        FROM
+        cash_receive_station t
+        WHERE
+        t.from_system = s.system_from_name
+        AND t.status in('1','3','4')
+        AND created_time &lt; #{date}
+        ) checkCount,
+        (
+        SELECT
+        ROUND(IFNULL(sum(t.money),0)/100,2)
+        FROM
+        cash_receive_station t
+        WHERE
+        t.from_system = s.system_from_name
+        AND created_time &gt; #{date}
+        ) toDaymoney,
+        (
+        SELECT
+        count(1)
+        FROM
+        cash_receive_station t
+        WHERE
+        t.from_system = s.system_from_name
+        AND created_time &gt; #{date}
+        ) toDaycheckCount
+        FROM
+        system_from s
+       <!-- <where>
+            <if test="systemName !='' and systemName!=null">
+                s.system_from_name = #{systemName}
+            </if>
+        </where>-->
+    </select>
+
+    <select id="getCrsInfosByStatus" resultType="com.zc.entity.cashreceivestation.CashReceiveStation">
+        <include refid="baseSelect"/>
+        FROM cash_receive_station WHERE from_system = #{systemName} AND created_time &lt; CURDATE() AND status =
+        #{status}
+    </select>
+
+   <!-- <insert id="saveCashCeiveStation" parameterType="com.zc.entity.cashreceivestation.CashReceiveStation">
+        INSERT INTO `cash_receive_station` (`after_balance`, `approve_date`, `audit_status`, `audit_time`, `bank_abbr`, `bank_name`, `bank_prv`, `bank_sub`, `card_no`, `chk_value`, `comments`, `create_time`, `create_user`, `created_ip`, `created_time`, `css_id`, `css_type`, `current_balance`, `current_describe`, `describer`, `fee_income`, `from_system`, `ip`, `mer_date`, `mer_seq_id`, `money`, `name`, `ora_name`, `ora_status`, `person_name`, `person_no`, `sign_date`, `status`, `system_role`, `tel`, `third_pay_type`, `update_time`, `versionid`, `notify_url`, `title`, `crs_task_address`) VALUES
+        ('1', '2018-05-03 09:48:07', '1', '2018-05-03 09:48:12', 'cin', '1', '1', '1', '11', '1', '1', '2018-05-03 09:48:25', '1', '1', '2018-05-03 09:47:27', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '2018-05-03 09:48:52', '1', '1', '1', '1')
+    </insert>-->
+
+   <update id="updateCrsStatus" parameterType="com.zc.entity.cashreceivestation.CashReceiveStation">
+        UPDATE cash_receive_station SET status = #{status},update_time = now() WHERE  id = #{id}
+    </update>
+
+
+    <update id="cashReceiveStationUpdate" parameterType="com.zc.entity.cashreceivestation.CashReceiveStation">
+        UPDATE cash_receive_station
+        <set>
+            <if test="createdTime != null">created_time=#{createdTime},</if>
+            <if test="money != null">money=#{money},</if>
+            <if test="bankName != null">bank_name=#{bankName},</if>
+            <if test="cardNo != null">card_no=#{cardNo},</if>
+            <if test="personName!= null">person_name=#{personName},</if>
+        </set>
+        WHERE   id = #{id}
+    </update>
+
+
+
+
+    <select id="getCashShuntingList" resultType="com.zc.vo.SystemFromCashShuntingVO">
+        SELECT ie.`name` AS thirdPayType, crs.fromSystem AS fromSystem, crs.totalMoney AS totalMoney,
+        crs.totalNum AS totalNum
+        FROM interface_entity ie LEFT JOIN (
+            SELECT third_pay_type, from_system AS fromSystem, TRUNCATE(SUM(money)/100,2) AS totalMoney,
+            COUNT(mer_seq_id) AS totalNum
+            FROM cash_receive_station
+            WHERE from_system = #{systemFromName}
+            AND created_time &lt; CURDATE()
+            AND status = 1
+            GROUP BY third_pay_type) crs
+        ON ie.`name` = crs.third_pay_type
+        WHERE crs.third_pay_type IS NOT NULL
+        OR ie.is_shunting_cash = 'true'
+        OR ie.is_shunting_cash = 'final'
+        AND ie.type = 1
+    </select>
+
+    <select id="getCashChannelShunting" resultType="java.lang.String">
+        SELECT `name` FROM interface_entity
+        WHERE is_shunting_cash = 'true'
+		OR is_shunting_cash = 'final'
+        AND type = 1
+    </select>
+
+
+
+    <!--修改代付分流配置-->
+    <select id="getCashShuntingBySytemAndChannel" resultType="com.zc.vo.SystemFromCashShuntingVO">
+        SELECT TRUNCATE(SUM(money)/100,2) AS totalMoney, COUNT(mer_seq_id) AS totalNum FROM cash_receive_station
+        WHERE from_system = #{fromSystem}
+        AND third_pay_type = #{fromChannel}
+        AND created_time &lt; CURDATE()
+        AND status = 1
+    </select>
+
+    <select id="getCashShuntingBySytemAndChannelLimit" resultType="com.zc.vo.SystemFromCashShuntingVO">
+        SELECT TRUNCATE(SUM(money)/100,2) AS totalMoney, COUNT(money) AS totalNum
+        FROM(
+            SELECT money  FROM cash_receive_station
+            WHERE from_system = #{fromSystem}
+            AND third_pay_type = #{fromChannel}
+            AND created_time &lt; CURDATE()
+            AND status = 1
+            ORDER BY money
+            LIMIT 0,${size}
+        ) crs
+    </select>
+
+    <update id="updateCashShuntingBySytemAndChannelLimit">
+        UPDATE cash_receive_station SET third_pay_type = #{toChannel}, notify_url = #{notifyUrl}, crs_task_address = #{crsTaskAddress}
+        WHERE from_system = #{fromSystem}
+        AND third_pay_type = #{fromChannel}
+        AND created_time &lt; CURDATE()
+        AND status = 1
+        ORDER BY money
+        LIMIT ${size}
+    </update>
+
+
+
+
+    <!--重发失败订单项目列表-->
+    <select id="getReShuntingList" resultType="java.util.Map">
+        SELECT sf.`name`, sf.system_from_name AS systemFromName, crs.totalMoney, crs.totalNum
+        FROM `system_from` sf LEFT JOIN (
+            SELECT from_system, COUNT(money) AS totalNum, SUM(money) AS totalMoney
+            FROM cash_receive_station
+            WHERE `status` = 3
+            GROUP BY from_system
+        ) crs
+        ON sf.system_from_name = crs.from_system
+    </select>
+
+
+    <!--获取项目重发代付分流情况-->
+    <select id="getReCashShuntingList" resultType="com.zc.vo.SystemFromCashShuntingVO">
+        SELECT ie.`name` AS thirdPayType, crs.fromSystem AS fromSystem, crs.totalMoney AS totalMoney,
+        crs.totalNum AS totalNum
+        FROM interface_entity ie LEFT JOIN (
+            SELECT third_pay_type, from_system AS fromSystem, TRUNCATE(SUM(money)/100,2) AS totalMoney,
+            COUNT(mer_seq_id) AS totalNum
+            FROM cash_receive_station
+            WHERE from_system = #{systemFromName}
+            AND `status` = 3
+            GROUP BY third_pay_type) crs
+        ON ie.`name` = crs.third_pay_type
+        WHERE crs.third_pay_type IS NOT NULL
+        OR is_shunting_cash = 'true'
+        OR is_shunting_cash = 'final'
+        AND type = 1
+    </select>
+
+
+
+    <!--修改重发代付分流配置-->
+    <select id="getReCashShuntingBySytemAndChannel" resultType="com.zc.vo.SystemFromCashShuntingVO">
+        SELECT TRUNCATE(SUM(money)/100,2) AS totalMoney, COUNT(mer_seq_id) AS totalNum
+        FROM cash_receive_station
+        WHERE from_system = #{fromSystem}
+        AND third_pay_type = #{fromChannel}
+        AND status = 3
+    </select>
+
+    <select id="getReCashShuntingBySytemAndChannelLimit" resultType="com.zc.vo.SystemFromCashShuntingVO">
+        SELECT TRUNCATE(SUM(money)/100,2) AS totalMoney, COUNT(money) AS totalNum
+        FROM(
+            SELECT money  FROM cash_receive_station
+            WHERE from_system = #{fromSystem}
+            AND third_pay_type = #{fromChannel}
+            AND status = 3
+            ORDER BY money
+            LIMIT 0,${size}
+        ) crs
+    </select>
+
+    <update id="updateReCashShuntingBySytemAndChannelLimit">
+        UPDATE cash_receive_station SET third_pay_type = #{toChannel}, notify_url = #{notifyUrl}, crs_task_address = #{crsTaskAddress}
+        WHERE from_system = #{fromSystem}
+        AND third_pay_type = #{fromChannel}
+        AND status = 3
+        ORDER BY money
+        LIMIT ${size}
+    </update>
+
+
+    <select id="getReceiveStationById" parameterType="java.lang.Long" resultType="com.zc.entity.cashreceivestation.CashReceiveStation">
+        SELECT
+		id,
+	    created_time AS createdTime,
+		bank_name AS bankName,
+		card_no AS cardNo,
+		person_name  AS personName,
+		mer_seq_id AS merSeqId,
+		money
+		FROM cash_receive_station
+        where id = #{id}
+    </select>
+     <!--添加操作日志-->
+    <insert id="insertLog" parameterType="com.zc.entity.logs.LoginOperatingLogs">
+        INSERT into login_operating_logs(created_time,update_time,operation_logs,create_user,created_ip) values(now(),now(),#{operationLogs},#{createUser},#{createdIp})
+    </insert>
+
+
+
+    <select id="getCrsAddress" resultType="java.util.Map">
+        SELECT address, crs_task_address AS crsTaskAddress FROM `interface_entity` WHERE `name` = #{toChannel}
+    </select>
+
+
+    <select id="getfromSystemList" resultType="map">
+        SELECT system_from_name AS fromSystem, `name` FROM `system_from`
+    </select>
+
+</mapper>

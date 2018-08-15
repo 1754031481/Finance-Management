@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.zjconfig.ZjCashConfigMapper">
+
+    <sql id="baseSelect">
+		SELECT
+	  id, create_user, created_ip,
+      created_time, update_time, account_type,
+      institutionid, method, name,
+      notificationurl, page_url, private_pfx_mima,
+      private_pfx_url, public_cer_url, rsa_name,
+      settlement_flag, w_getway_url_df, w_getway_url_zf,
+      payment_account_name, payment_account_number
+	</sql>
+
+
+    <select id="findZjCashConfig" resultType="map">
+        <include refid="baseSelect"/>  FROM zj_cash_config   ORDER BY created_time DESC
+    </select>
+
+    <select id="findConfig" resultType="Map" parameterType="com.zc.entity.zjconfig.ZjCashConfig">
+       SELECT id,notificationurl,page_url,private_pfx_mima,private_pfx_url,public_cer_url,w_getway_url_df,w_getway_url_zf FROM zj_cash_config  WHERE  id = #{ZjCashId}
+    </select>
+
+
+    <update id="updateZjCashConfig" parameterType="com.zc.entity.zjconfig.ZjCashConfig">
+       UPDATE zj_cash_config
+        <set>
+            <if test="accountType != null">account_type=#{accountType},</if>
+            <if test="institutionid != null">institutionid=#{institutionid},</if>
+            <if test="method != null">method=#{method},</if>
+            <if test="name != null">name=#{name},</if>
+            <if test="notificationurl != null">notificationurl=#{notificationurl},</if>
+            <if test="pageUrl != null">page_url=#{pageUrl},</if>
+            <if test="privatePfxMima != null">private_pfx_mima=#{privatePfxMima},</if>
+            <if test="privatePfxUrl != null">private_pfx_url=#{privatePfxUrl},</if>
+            <if test="publicCerUrl != null">public_cer_url=#{publicCerUrl},</if>
+            <if test="rsaName != null">rsa_name=#{rsaName},</if>
+            <if test="settlementFlag != null">settlement_flag=#{settlementFlag},</if>
+            <if test="wGetwayUrlDf != null">w_getway_url_df=#{wGetwayUrlDf},</if>
+            <if test="wGetwayUrlZf != null">w_getway_url_zf=#{wGetwayUrlZf},</if>
+            <if test="paymentAccountName != null">payment_account_name=#{paymentAccountName},</if>
+            <if test="paymentAccountNumber != null">payment_account_number=#{paymentAccountNumber},</if>
+        </set>
+        WHERE   id = #{id}
+    </update>
+    
+    <insert id="addZjCashConfig"  parameterType="com.zc.entity.zjconfig.ZjCashConfig" >
+        INSERT INTO zj_cash_config ( created_time,update_time,account_type,institutionid,method,name,notificationurl,page_url,private_pfx_mima,
+                    private_pfx_url,public_cer_url,rsa_name,settlement_flag,w_getway_url_df,w_getway_url_zf,payment_account_name,payment_account_number)
+        VALUES (#{createdTime},#{updateTime},#{accountType},#{institutionid},#{method},#{name},#{notificationurl},#{pageUrl},#{privatePfxMima},#{privatePfxUrl},
+                 #{publicCerUrl},#{rsaName},#{settlementFlag},#{wGetwayUrlDf},#{wGetwayUrlZf},#{paymentAccountName},#{paymentAccountNumber});
+    </insert>
+
+</mapper>

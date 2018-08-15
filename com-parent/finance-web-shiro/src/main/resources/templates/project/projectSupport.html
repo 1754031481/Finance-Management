@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <title>项目支持</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common/models.css}">
+    <!--bootstrap-select  css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/bootstrapselect/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/bootstrapselect/css/bootstrap-select.css}"/>
+    <!--文件树插件 css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/ztree/zTreeStyle.css}">
+    <style>
+        #filename{
+            width: 67px !important;
+        }
+        #SWFUpload_0{
+            width: 67px !important;
+        }
+        #filename-button{
+            background-repeat: no-repeat;
+            width: 67px !important;
+        }
+    </style>
+
+</head>
+<body>
+<div class="MainContent">
+    <!--面包屑-->
+    <div class="current">当前位置：<a href="#">关于项目</a>&nbsp;&gt;&nbsp;<span>项目支持</span></div>
+    <!--end 面包屑-->
+    <!--主体内容-->
+    <div class="MainCont">
+        <!--标题-->
+
+        <div class="ph_subTit">
+            <h2>项目支持列表</h2>
+            <div class="ph_snbBtn">
+                <input class="Js_deliver" name="" type="button" value="添加">
+            </div>
+        </div>
+
+        <!--end 标题-->
+        <!--专题列表-->
+        <div class="ph_wareBox">
+            <table class="ph_wareList" id="example"></table>
+        </div>
+        <!--end 专题列表-->
+    </div>
+    <!--end 主体内容-->
+</div>
+
+
+<!--添加项目弹窗-->
+<div class="PopupBox" id="deliverBox">
+    <!--内容-->
+    <div class="PopupCon">
+        <div class="ph_subPoCon ph_screen">
+            <form id="addProjectForm">
+                <table class="ph_tableBox">
+                    <input id="editProjectrId" name="id" type="hidden">
+                    <tbody><tr>
+                        <th><span class="require">*</span>项目名称：</th>
+                        <td><input id="projectName" class="validate[required, maxSize[50]]" name="projectName" type="text">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>项目标识：</th>
+                        <td><input id="projectSign" name="projectSign" class="validate[required, maxSize[50]]" type="text"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>支付接口：</th>
+                        <td><select id="paylist"><option value="">=======请选择======</option></select></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>代付接口：</th>
+                        <td><select id="cashlist"><option value="">=======请选择======</option></select></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>异步通知地址：</th>
+                        <td><textarea id="systemFromUrl" class="validate[required, maxSize[200]]" name="systemFromUrl" type="text"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>是否支持项目：</th>
+                        <td><input id="sS0" class="validate[required]" name="supportStatue" type="radio" value="0" checked="checked">支持
+                            <input id="sS1" class="validate[required]" name="supportStatue" type="radio" value="1">不支持
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>是否代付分流：</th>
+                        <td><input id="sC1" class="validate[required]" name="shuntingCash" type="radio" value="true">支持
+                            <input id="sC2" class="validate[required]" name="shuntingCash" type="radio" value="false" checked="checked">不支持
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>是否支付分流：</th>
+                        <td><input id="sP1" class="validate[required]" name="shuntingPay" type="radio" value="true">支持
+                            <input id="sP2" class="validate[required]" name="shuntingPay" type="radio" value="false" checked="checked">不支持
+                        </td>
+                    </tr>
+                    </tbody></table>
+            </form>
+        </div>
+    </div>
+    <!--end 内容-->
+</div>
+<!--end 添加项目弹窗-->
+
+<!--查看项目弹窗-->
+<div class="PopupBox" id="viewDetails">
+    <!--内容-->
+    <div class="PopupCon">
+        <div class="ph_subPoCon ph_screen">
+            <form id="projectDetails">
+                <table class="ph_tableBox">
+                    <tbody>
+                    <tr>
+                        <th><span class="require">*</span>项目标识：</th>
+                        <td><input id="viewProjectSign" class="validate[required]" type="text" disabled="disabled"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>异步通知地址：</th>
+                        <td><textarea id="viewSystemFromUrl" class="validate[required, maxSize[50]]" type="text" disabled="disabled">
+                        </textarea>
+                        </td>
+                    </tr>
+                    </tbody></table>
+            </form>
+        </div>
+    </div>
+    <!--end 内容-->
+</div>
+<!--end 查看项目弹窗-->
+
+<!--操作框 -->
+<div id="handle">
+</div>
+<!--end 操作框-->
+
+<script type="text/javascript" th:src="@{/js/common/jquery-1.11.1.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/common/index.js}"></script>
+<!--bootstrap-select-->
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/bootstrap-select.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/select.js}"></script>
+<!--分页-->
+<script type="text/javascript" th:src="@{/js/plugins/pages/jquery.dataTables.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/layer/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/spm/spmExtends.js}"></script>
+<!--bootstrap-select-->
+
+<!-- 验证 -->
+<script type="text/javascript" th:src="@{/js/plugins/validat/jquery.validationEngine.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/validat/jquery.validationEngine-zh_CN.js}"></script>
+
+<!--文件树插件-->
+<!--<script type="text/javascript" th:src="@{/static/js/plugins/ztree/jquery-1.4.4.min.js}"></script>-->
+<script type="text/javascript" th:src="@{/js/plugins/ztree/jquery.ztree.core.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/ztree/jquery.ztree.excheck.min.js}"></script>
+<!--上传图片-->
+<script type="text/javascript" th:inline="javascript">
+    var tb;
+    var sessionUser = [[${session.login_back_session}]];
+    $(function () {
+        $.ajax({
+            type : 'GET',
+            url : '/project/projectSupport/getInterface',
+            success : function (data) {
+                var a  = $.parseJSON(data);
+                var code = a.code;
+                if (code == "1") {
+                    var paylist = a.content.paylist;
+                    var cashlist = a.content.cashlist;
+                    var paystr = '<select id="paylist"><option value="" id="pLdefault">=======请选择======</option>';
+                    var cashstr = '<select id="cashlist"><option value="" id="cLdefault">=======请选择======</option>';
+                    $.each(paylist,function(i,n){
+                        paystr += '<option value="'+n+'" id="'+n+'">'+n+'</option>';
+                    });
+                    $.each(cashlist,function(i,n){
+                        cashstr += '<option value="'+n+'" id="'+n+'">'+n+'</option>';
+                    });
+                    paystr += '</select>';
+                    cashstr += '</select>';
+                    $("#paylist").html(paystr);
+                    $("#cashlist").html(cashstr);
+                } else {
+                    layer.alert(data.msg, {
+                        icon: 2,
+                        title: '获取下拉菜单失败',
+                        closeBtn: 0,
+                        btnAlign: 'c'
+                    });
+                    return false;
+                }
+            }
+        });
+        var Popupe = new PopupBase();
+        Popupe.show('.ph_wareBox', '.Js_btn', '.maskBox,.DeterBox');
+        Popupe.showHide('.subQuemit', '.refundBox,.deliverBox,.menuTreeBox', '.SucBox');
+        Popupe.show('.ph_snbBtn,.ph_wareBox', '.Js_deliver', '.maskBox,.deliverBox');
+        Popupe.show('.ph_wareBox', '.Js_menuTree', '.maskBox,.menuTreeBox');
+        Popupe.hide('.close', '.maskBox,.DeterBox,.SucBox,.deliverBox,.menuTreeBox');
+        tb = $('#example').DataTable({
+            "lengthChange": false,
+            "ordering": false,
+            "searching": false,
+            "bServerSide": true,
+            "autoWidth": false,
+            "sPaginationType": "full_numbers",
+            "bJQueryUI": true,
+            "sDom": '<"">t<"F"ip>',
+            "sAjaxSource": "/project/projectSupport/list", //ajax调用接口===============================调用接口=====================================
+            "aoColumnDefs": [{sDefaultContent: '', aTargets: ['_all']}],
+            "aoColumns": [
+                {"sWidth": "50px", "sTitle": "序号", "mData": "id", "title": "id"},
+                {"sTitle": "项目名称", "mData": "projectName", "class": "sClass"},
+                {"sTitle": "支付接口", "mData": "payInterface", "class": "sClass"},
+                {"sTitle": "代付接口", "mData": "cashInterface", "class": "sClass"},
+                {
+                    "sTitle": "是否支持项目", "mData": "supportStatue", "class": "sClass", "mRender": function (data, type, full) {
+                        var text;
+                        if (full.supportStatue == '0') {
+                            text = "<font>支持</font>";
+                        } else {
+                            text = "<font color='#C7C7C7'>不支持</font>";
+                        }
+                        return text;
+                    }
+                },
+                {
+                    "sTitle": "是否代付分流", "mData": "shuntingCash", "class": "sClass", "mRender": function (data, type, full) {
+                        var text;
+                        if (full.shuntingCash == 'true') {
+                            text = "<font>支持</font>";
+                        } else {
+                            text = "<font color='#C7C7C7'>不支持</font>";
+                        }
+                        return text;
+                    }
+                },
+                {
+                    "sTitle": "是否支付分流", "mData": "shuntingPay", "class": "sClass", "mRender": function (data, type, full) {
+                        var text;
+                        if (full.shuntingPay == 'true') {
+                            text = "<font>支持</font>";
+                        } else {
+                            text = "<font color='#C7C7C7'>不支持</font>"
+                        }
+                        return text;
+                    }
+                },
+                {
+                    "sWidth": "110px",
+                    "sTitle": "操作",
+                    "mData": "",
+                    "sClass": "ph_tableShow",
+                    "mRender": function (data, type, full) {
+                        var text = '<div class="ph_operateBox"><input class="ph_operate" name="" type="button" value="操作选项">';
+                        text = text + '<ul class="ph_operateList hide" role="menu">';
+
+                        text += '<li><div class="temp_data" style="display:none">'+ JSON.stringify(full) +'</div><a href="javascript:void(0);" onclick="viewDetails(this)">查看</a></li>';
+
+                        text += '<li><div class="temp_data" style="display:none">'+ JSON.stringify(full) +'</div><a href="javascript:void(0);" onclick="modify(this);">修改</a> </li>';
+
+                        text += '<li><a href="javascript:void(0);"  onclick="reSendCash(\'' + full.projectSign + '\'+\'' + full.projectName + '\');">重发今日代付</a> </li>';
+
+                        text += '<li><a href="javascript:void(0);"  onclick="failbackCallback(\'' + full.projectSign + '\');">审核失败回调</a> </li>';
+
+                        text = text + '</ul></div>';
+                        return text;
+                    }
+                }
+            ],
+            "oLanguage": {
+                "sProcessing": "数据加载中······",
+                "sLengthMenu": "显示 _MENU_ 条记录",
+                "sZeroRecords": "没有您要搜索的内容！",
+                "sEmptyTable": "列表中无数据存在！",
+                "sInfo": "当前显示 _START_ 到 _END_ 条数据，共 _TOTAL_ 条数据",
+                "sInfoEmpty": "显示 0 到 0 条记录",
+                "sInfoFiltered": "数据列表中共  _MAX_ 条记录",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上一页",
+                    "sNext": "下一页",
+                    "sLast": "末页"
+                }
+            },
+            "fnServerData": function (sSource, aoData, fnCallback, oSettings) {
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "GET",
+                    "async": 'false',
+                    "url": sSource,
+                    "data": {
+                        'pageNum': (aoData[3].value / aoData[4].value) + 1,
+                        'pageSize': aoData[4].value,
+                        'id': $("#id").val(),
+                        'roleName': $("#roleName").val(),
+                        'status': $('#selectStatus').val()
+                    },
+                    "success": fnCallback
+                });
+            },
+            "fnDrawCallback": function () {
+                var api = this.api();
+                var startIndex = api.context[0]._iDisplayStart;//获取到本页开始的条数
+                api.column(0).nodes().each(function (cell, i) {
+                    cell.innerHTML = startIndex + i + 1;
+                });
+
+            }
+        });
+
+
+        $('.ph_snbBtn').on('click', '.Js_deliver', function () {
+
+
+            $('#addProjectForm')[0].reset();
+            layer.open({
+                type: 1,
+                title: '项目添加',
+                closeBtn: 0,
+                area: ['600px', '400px'],
+                btn: ['保存', '取消'],
+                btnAlign: 'c',
+                content: $('#deliverBox'),
+                btn1: function (index) {
+
+                    var flag = $("#addProjectForm").validationEngine("validate");
+                    if (!flag) {
+                        return false;
+                    }
+                    var dataObj = {
+                        payInterface : $("#paylist").val(),
+                        cashInterface : $("#cashlist").val()
+                    }
+                    var data = $("#addProjectForm").serialize()+'&'+$.param(dataObj);
+                    $.ajax({
+//              async       : false,
+                        type: "POST",
+                        url: "/project/projectSupport/add",
+                        data: data,
+                        success: function (d) {
+                            var a = $.parseJSON(d);
+                            if (a.code == "1") {
+                                layer.alert("保存成功！", {
+                                    icon: 1,
+                                    title: '提示',
+                                    closeBtn: 0,
+                                    btnAlign: 'c'
+                                });
+                                tb.draw();
+                            } else {
+                                layer.alert(a.msg, {
+                                    icon: 2,
+                                    title: '失败',
+                                    closeBtn: 0,
+                                    btnAlign: 'c'
+                                });
+                            }
+                        }
+                    });
+                    $('#addProjectForm')[0].reset()
+                    layer.close(index);
+
+                }
+            });
+        });
+        //验证初始化
+        $('#addProjectForm').validationEngine({
+            promptPosition: 'bottomLeft'
+            , autoPositionUpdate: false
+            , addPromptClass: 'formError-text'
+            , autoHidePrompt: true
+            , autoHideDelay: 3000
+            , fadeDuration: 0.3
+        });
+    });
+
+
+    function viewDetails(self) {
+        var temp = $(self).prev(".temp_data").html()
+        var data = JSON.parse(temp);
+        $("#viewProjectSign").val(data.projectSign);
+        $("#viewSystemFromUrl").val(data.systemFromUrl);
+        layer.open({
+            type: 1,
+            title: '项目查看',
+            closeBtn: 0,
+            area: ['500px', '400px'],
+            btn: ['确定'],
+            btnAlign: 'c',
+            content: $('#viewDetails')
+        });
+    }
+
+
+    function modify(self) {
+        var temp = $(self).prev(".temp_data").html()
+        var data = JSON.parse(temp);
+        $("#"+data.payInterface).prop("selected", true);
+        $("#"+data.cashInterface).prop("selected", true);
+        $("#editProjectrId").val(data.id);
+        $("#projectName").val(data.projectName);
+        $("#projectSign").val(data.projectSign);
+        $("#systemFromUrl").val(data.systemFromUrl);
+        if (data.supportStatue == "0") {
+            $("#sS1").prop("checked", false);
+            $("#sS0").prop("checked", true);
+        } else {
+            $("#sS0").prop("checked", false);
+            $("#sS1").prop("checked", true);
+        }
+        if (data.shuntingCash == "true") {
+            $("#sC2").prop("checked", false);
+            $("#sC1").prop("checked", true);
+        } else {
+            $("#sC1").prop("checked", false);
+            $("#sC2").prop("checked", true);
+        }
+        if (data.shuntingPay == "true") {
+            $("#sP2").prop("checked", false);
+            $("#sP1").prop("checked", true);
+        } else {
+            $("#sP1").prop("checked", false);
+            $("#sP2").prop("checked", true);
+        }
+
+
+            layer.open({
+                type: 1,
+                title: '项目修改',
+                closeBtn: 0,
+                area: ['442px', '400px'],
+                btn: ['保存', '取消'],
+                btnAlign: 'c',
+                content: $('#deliverBox'),
+                btn1: function (index) {
+
+                    var flag = $("#addProjectForm").validationEngine("validate");
+                    if (!flag) {
+                        return false;
+                    }
+                    var dataObj = {
+                        payInterface: $("#paylist").val(),
+                        cashInterface: $("#cashlist").val()
+                    }
+                    var data = $("#addProjectForm").serialize() + '&' + $.param(dataObj);
+                    $.ajax({
+//              async       : false,
+                        type: "POST",
+                        url: "/project/projectSupport/update",
+                        data: data,
+                        success: function (data) {
+                            var a = $.parseJSON(data);
+                            if (a.code == "1") {
+                                layer.alert("保存成功！", {
+                                    icon: 1,
+                                    title: '提示',
+                                    closeBtn: 0,
+                                    btnAlign: 'c'
+                                });
+                                tb.draw(false);
+                            } else {
+                                layer.alert(a.msg, {
+                                    icon: 2,
+                                    title: '失败',
+                                    closeBtn: 0,
+                                    btnAlign: 'c'
+                                });
+                            }
+                        }
+                    });
+                    $('#addProjectForm')[0].reset()
+                    layer.close(index);
+                },
+                btn2: function (index) {
+                    $("#pLdefault").prop("selected", true);
+                    $("#cLdefault").prop("selected", true);
+                    $("#sS1").prop("checked", true);
+                    $("#sC2").prop("checked", true);
+                    $("#sP2").prop("checked", true);
+                }
+            });
+    }
+
+
+
+    //重发今日代付
+    function reSendCash(projectSign,projectName){
+        layer.open({
+            type:'0',
+            icon: 1,
+            title: '提示',
+            btn:['确定','取消'],
+            closeBtn: 0,
+            btnAlign: 'c',
+            content: '您确定要发起该项目的提现嘛?',
+            yes: function(index, layero){
+                layer.close(index);
+                $.ajax({
+                    async:false,
+                    url:"/project/projectSupport/rechargeToDayPayment",
+                    data:{systemName:projectSign,projectName:projectName},
+                    type:"POST",
+                    dataType:"json",
+                    success:function(data){
+                        if (data.code==200) {
+                            layer.open({
+                                type: 1,
+                                title: '查看',
+                                closeBtn : 0,
+                                area: ['600px','500px'],
+                                btn:['确定'],
+                                btnAlign: 'c',
+                                content: $('#findLinkmanBox'),
+                                yes:function (index, layero) {
+                                    layer.close(index);
+                                }
+                            });
+                        } else {
+                            layer.alert(data.msg, {icon: 0,btnAlign: 'c', closeBtn : 0});
+                        }
+                        layer.close(index);
+                    },btn2: function(index, layero){
+                        layer.close(index);
+                    }
+                });
+            },btn2: function(index, layero){
+                //按钮【按钮二】的回调
+
+            }
+        });
+    }
+
+
+
+    //审核失败回调
+    function failbackCallback(projectSign){
+        layer.open({
+            type:'0',
+            icon: 1,
+            title: '提示',
+            btn:['确定','取消'],
+            closeBtn: 0,
+            btnAlign: 'c',
+            content: '您确定要发起该项目的失败回调数据吗?',
+            yes: function(index, layero){
+                layer.close(index);
+                $.ajax({
+                    async:false,
+                    url:"/project/projectSupport/auditFailedCallBack",
+                    data:{systemName:projectSign},
+                    type:"POST",
+                    dataType:"json",
+                    success:function(data){
+                        if(data.code==1){
+                            layer.alert(data.msg, {
+                                icon: 1,
+                                title: '提示',
+                                closeBtn: 0,
+                                btnAlign: 'c'
+                            });
+                        }else{
+                            layer.alert(data.msg, {
+                                icon: 1,
+                                title: '提示',
+                                closeBtn: 0,
+                                btnAlign: 'c'
+                            });
+                        }
+                    },btn2: function(index, layero){
+                        layer.close(index);
+                    }
+                });
+            },btn2: function(index, layero){
+                //按钮【按钮二】的回调
+
+            }
+        });
+    }
+    $("#example").on("mouseenter",".ph_tableShow",function(){
+        $(this).attr("title","")
+    });
+    // 原生写法
+    // js 实现匹配空格删除
+    var mer_url = document.getElementsByTagName('input');
+    for (var i = 0; i < mer_url.length; i++) {
+        mer_url[i].onblur = function() {
+            this.value = Trim(this.value);
+        };
+    }
+
+    // 监测空格函数 如果有空格替换成空
+    function Trim(str) {
+        return str.replace(/\s*/g,"");
+    }
+
+    // js 实现匹配空格删除
+    var text_url = document.getElementsByTagName('textarea');
+    for (var i = 0; i < text_url.length; i++) {
+        text_url[i].onblur = function() {
+            this.value = Trim(this.value);
+        };
+    }
+</script>
+</body>
+</html>

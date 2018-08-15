@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>财务后台登录</title>
+    <link th:href="@{/images/favicon.ico}" rel="icon" type="image/x-icon" href="../images/favicon.ico"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common/models.css}" href="../css/common/models.css">
+    <script type="text/javascript" th:src="@{/js/common/jquery-1.11.1.min.js}" href="../js/common/jquery-1.11.1.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/common/login.css}" href="../css/common/login.css"/>
+    <link rel="stylesheet"  th:href="@{/css/component.css}"/>
+    <style>
+        html,body{
+            width:100%;
+            height:100%;
+        }
+        .img {
+            margin-right: 10px;
+            height: 36px;
+            margin-top: 1px;
+        }
+
+        .img_pointer {
+            cursor: pointer;
+        }
+
+        .ret_prompt {
+            margin-top: 39px;
+            width: 250px;
+            height: 18px;
+            display: block;
+            line-height: 18px;
+            font-size: 14px;
+            color: #ce5242;
+            left: 27px;
+            bottom: 89px;
+            position: absolute;
+        }
+
+        .login_box {
+            position: relative;
+        }
+
+        .back_jump_clas {
+            display: none
+        }
+        .xiao {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<!--登录-->
+<input type="hidden" id="checked">
+<div class="loginBox" style="position:relative;width:100%;height:100%">
+    <div class="loginCon" style="height: 435px">
+        <h2 style="height: 30px"><font size="6" face="楷体">财 务 后 台</font> </h2>
+        <form id="loginForm" action="/doLogin" method="post">
+            <p class="loginTxt"><input name="telphone" class="validate[required, maxSize[11],custom[phone]]" type="text"
+                                       placeholder="请输入手机号"><span class="loginErr"></span>
+            </p>
+            <p class="loginTxt"><input name="password"
+                                       class="validate[required,minSize[6],maxSize[16]]"
+                                       type="password"
+                                       placeholder="请输入密码"><span
+                    class="loginErr"></span></p>
+
+            <p class="loginTxt"><input name="ootpCode"
+                                       class="validate[required,minSize[6],maxSize[16]]"
+                                       type="text"
+                                       placeholder="请输入动态口令"><span
+                    class="loginErr"></span></p>
+
+
+           <!-- <div class="content" id="con" >
+                <div id="back" style="width: 360px;height: 216px;display: block"  ><img src="" alt="" class="xiao" id='xiao' /></div>
+                <button class="refresh" onclick="refresh()" type="button"></button>
+            </div>
+            <div id="tiao" style="width: 360px;height: 38px"><div id="div2" class=""></div><div id="div1" class=""></div><span>向右滑动滑块填充拼图</span></div>-->
+            <div class="content" id="con" >
+                <div id="back" style="width: 360px;height: 216px;display: block"  ><img src="" alt="" class="xiao" id='xiao' />
+                    <div id="zhedang">
+                        图形验证失败
+                    </div>
+                </div>
+                <!--<input type="button" class="refresh" onclick="refresh()" style="min-width: 35px"/>-->
+                <button class="refresh" onclick="refresh()" type="button"></button>
+            </div>
+            <div id="tiao" style="width: 360px;height: 38px">
+                <div id="div2" class=""></div>
+                <div id="div1" class=""></div>
+                <span>向右滑动滑块填充拼图</span>
+            </div>
+
+            <br/><br/><br/>
+            <p class="loginBtn"><input name="" id="loginBtn" type="button" value="登录"></p>
+        </form>
+     <!--    <p class="loginConTxt">
+            <span class="left">还没有代理账号？
+                <a href="javascript:void(0);"
+                   onclick=" window.location.href = '/web/agent/addOrUpdate?operateType=applyAgent'">代理申请
+                </a>
+            </span>
+            <span class="right"><a href="/findPassword">忘记密码？</a></span>
+        </p> -->
+
+        <P class="loginTxt" id="msg" th:if="${'' != msg}">
+            <span style="color: red" th:text="${msg}"></span>
+            <script type="text/javascript">
+                setTimeout('$("#msg").hide("slow")', 3000);
+            </script>
+        </P>
+
+    </div>
+
+</div>
+
+<script type="text/javascript" th:src="@{/js/plugins/layer/layer.js}" href="../js/plugins/layer/layer.js"></script>
+<!-- 验证 -->
+<script type="text/javascript" th:src="@{/js/plugins/validat/jquery.validationEngine.js}" href="../js/plugins/validat/jquery.validationEngine.js"></script>
+<script type="text/javascript" th:src="@{/js/plugins/validat/jquery.validationEngine-zh_CN.js}" href="../js/plugins/validat/jquery.validationEngine-zh_CN.js"></script>
+<script type="text/javascript"  th:src="@{/js/zepto.min.js}"></script>
+<script type="text/javascript"  th:src="@{/js/move.js}"></script>
+<script>
+    var tipsIndex;
+    $(function () {
+            $("#tiao").mouseover(function () {
+                var check = $("#checked").val();
+                if(check==1){
+                    $('.content').css({'display': 'none'})
+                }else {
+                    $('.content').css({'display': 'block'})
+                }
+            });
+            $(".content").mouseleave(function () {
+                $('.content').css({'display': 'none'})
+            });
+
+        //验证初始化
+        $('#loginForm').validationEngine({
+            promptPosition: 'bottomLeft'
+            , autoPositionUpdate: false
+            , addPromptClass: 'formError-text'
+            , autoHidePrompt: true
+            , autoHideDelay: 3000
+            , fadeDuration: 0.3
+        });
+
+        loadVerifyCode();//加载验证码
+        //defhiden();
+        bingClosetipsIndex();
+        // 回车事件
+        document.onkeydown = function (e) {
+            var ev = document.all ? window.event : e;
+            if (ev.keyCode == 13) {
+                var flag = $("#loginForm").validationEngine("validate");
+                if (!flag) {
+                    return false;
+                }
+                $("#loginForm").submit();
+            }
+        }
+
+        if (window != top) {
+            top.location.href = location.href;
+        }
+
+        $("input[type='telPhone'] ").val("")
+        $("input[type='password'] ").val("")
+
+        $("#loginBtn").click(function () {
+            var flag = $("#loginForm").validationEngine("validate");
+            if (!flag) {
+                return false;
+            }
+            var check = $("#checked").val();
+            if(check!=1){
+                return false;
+            }
+            $("#loginForm").submit();
+        });
+
+    });
+
+    function defhiden() {
+        $('.img').css('display', 'none');
+        $('span.get_yzm').click(function () {
+            $(this).css('display', 'none');
+            $('.img').css('display', 'block');
+        });
+    }
+    //点击跟新验证码
+    $("#verify_codeid").click(function () {
+        loadVerifyCode();
+    })
+    function loadVerifyCode() {
+        var url = "/loadverify";
+        $("#verify_codeid").attr("src", url + "?" + Date.parse(new Date()));
+    }
+    //处理得到焦点后去掉提示
+    function bingClosetipsIndex() {
+        $('#login_user').on("focus", function () {
+            if (tipsIndex) {
+                layer.close(tipsIndex);
+            }
+        });
+        $('#login_pwd').on("focus", function () {
+            if (tipsIndex) {
+                layer.close(tipsIndex);
+            }
+        });
+        $('#verify_codeval').on("focus", function () {
+            if (tipsIndex) {
+                layer.close(tipsIndex);
+            }
+        });
+    }
+
+    function refresh() {;
+        $('#tiao').html('<div id="div2" class=""></div><div id="div1" class=""></div><span>向右滑动滑块填充拼图</span>');
+        getCode();
+        pcMove()
+
+    }
+</script>
+<!--end 登录-->
+</body>
+</html>

@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+
+<head>
+    <meta charset="UTF-8">
+    <title>商银信支付配置列表</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common/models.css}">
+    <!--bootstrap-select  css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/bootstrapselect/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/bootstrapselect/css/bootstrap-select.css}"/>
+    <!--文件树插件 css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/ztree/zTreeStyle.css}">
+    <style>
+        #filename {
+            width: 67px !important;
+        }
+
+        #SWFUpload_0 {
+            width: 67px !important;
+        }
+
+        #filename-button {
+            background-repeat: no-repeat;
+            width: 67px !important;
+        }
+    </style>
+
+</head>
+<body>
+<div class="MainContent">
+    <!--面包屑-->
+    <div class="current">当前位置：<a href="#">关于配置</a>&nbsp;&gt;&nbsp;<span>丰付渠道支付配置</span></div>
+    <!--end 面包屑-->
+    <!--主体内容-->
+    <div class="MainCont">
+        <!--标题-->
+
+        <div class="ph_subTit">
+            <h2>商银信支付配置列表</h2>
+            <!--<shiro:hasPermission name="topicAdd">-->
+            <div class="ph_snbBtn">
+                <input class="Js_addLogistic" name="" type="button" value="添加">
+            </div>
+            <!--</shiro:hasPermission>-->
+        </div>
+
+        <!--end 标题-->
+        <!--丰付支付配置列表-->
+        <div class="ph_wareBox">
+            <table class="ph_wareList" id="example"></table>
+        </div>
+        <!--end 丰付支付配置列表-->
+    </div>
+    <!--end 主体内容-->
+</div>
+
+
+<!--添加配置弹窗-->
+<div class="PopupBox" id="addLinkmanBox">
+    <!--关闭按钮-->
+    <a href="javascript: void(0);" class="close"></a>
+    <!--end 关闭按钮-->
+    <!--内容-->
+    <div class="PopupCon">
+        <div class="ph_subPoCon ph_screen">
+            <form class="form-inline" id="addLogisticForm">
+                <table class="ph_tableBox">
+                    <input id="id" name="id" hidden="hidden"/>
+                    <tr>
+                        <th><span class="require">*</span>支持的项目名：</th>
+                        <td><select id="systemFormList" name="name"
+                                    class="validate[required,min[1],maxSize[50]"></select></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>接口名称：</th>
+                        <td><input name="service" type="text" id="service" class="validate[required,min[1],maxSize[50]">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>商户号：</th>
+                        <td><input name="merchantId" type="text" id="merchantId"
+                                   class="validate[required,min[1],maxSize[50]"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>通知Url：</th>
+                        <td><input name="notifyUrl" type="text" id="notifyUrl"
+                                   class="validate[required,min[1],maxSize[200]"></td>
+                    </tr>
+
+                    <tr>
+                        <th><span class="require">*</span>返回URL：</th>
+                        <td><input name="returnUrl" type="text" id="returnUrl"
+                                   class="validate[required,min[1],maxSize[200]"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>签名类型：</th>
+                        <td><input name="signType" type="text" id="signType"
+                                   class="validate[required,min[1],maxSize[50]"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>参数编码 ：</th>
+                        <td><input name="inputCharset" type="text" id="inputCharset"
+                                   class="validate[required,min[1],maxSize[50]"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>访问路径：</th>
+                        <td><input name="gateway" type="text" id="gateway"
+                                   class="validate[required,min[1],maxSize[200]"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>验签路径：</th>
+                        <td><input name="verifyway" type="text" id="verifyway"
+                                   class="validate[required,min[1],maxSize[200]"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>公钥：</th>
+                        <td><input name="publicSign" type="text" id="publicSign"
+                                   class="validate[required,min[1],maxSize[3000]"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>私钥：</th>
+                        <td><input name="privateSign" type="text" id="privateSign"
+                                   class="validate[required,min[1],maxSize[3000]"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>查询地址：</th>
+                        <td><input name="queryUrl" type="text" id="queryUrl"
+                                   class="validate[required,min[1],maxSize[3000]"></td>
+                    </tr>
+
+                </table>
+            </form>
+        </div>
+
+    </div>
+    <!--end 内容-->
+</div>
+<!--end 添加配置弹窗-->
+
+
+<!-- 查看弹窗-->
+<div class="PopupBox" id="findLinkmanBox">
+    <!--关闭按钮-->
+    <a href="javascript: void(0);" class="close"></a>
+    <!--end 关闭按钮-->
+    <!--内容-->
+    <div class="PopupCon">
+        <div class="ph_subPoCon ph_screen">
+            <form class="form-inline" id="addFindLogisticForm">
+                <table class="ph_tableBox">
+                    <input id="id" name="id" hidden="hidden"/>
+                    <tr>
+                        <th><span class="require">*</span>访问路径：</th>
+                        <td><textarea id="gateway2" name="publicSign" disabled="true"></textarea></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>验签路径：</th>
+                        <td><textarea id="verifyway2" name="publicSign" disabled="true"></textarea></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>通知URL：</th>
+                        <td><textarea id="notify_url2" name="publicSign" disabled="true"></textarea></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>返回URL：</th>
+                        <td><textarea id="return_url2" name="publicSign" disabled="true"></textarea></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>公钥：</th>
+                        <td><textarea id="publicSign2" name="private_key" disabled="true"></textarea></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>私钥：</th>
+                        <td><textarea id="privateSign2" name="privateSign" disabled="true"></textarea></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>查询地址：</th>
+                        <td><textarea id="queryUrl2" name="queryUrl" disabled="true"></textarea></td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+
+    </div>
+    <!--end 内容-->
+</div>
+<!--end查看弹窗-->
+
+
+<!--遮罩层-->
+<div class="maskBox"></div>
+</div>
+
+<!--操作框 -->
+<div id="handle">
+</div>
+<!--end 操作框-->
+
+<script type="text/javascript" th:src="@{/js/common/jquery-1.11.1.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/common/index.js}"></script>
+<!--bootstrap-select-->
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/bootstrap-select.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/select.js}"></script>
+<!--分页-->
+<script type="text/javascript" th:src="@{/js/plugins/pages/jquery.dataTables.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/layer/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/spm/spmExtends.js}"></script>
+<!--bootstrap-select-->
+
+<!-- 验证 -->
+<script type="text/javascript" th:src="@{/js/plugins/validat/jquery.validationEngine.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/validat/jquery.validationEngine-zh_CN.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/common/util.js}"></script>
+
+<!--文件树插件-->
+<!--<script type="text/javascript" th:src="@{/static/js/plugins/ztree/jquery-1.4.4.min.js}"></script>-->
+<script type="text/javascript" th:src="@{/js/plugins/ztree/jquery.ztree.core.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/ztree/jquery.ztree.excheck.min.js}"></script>
+<script type="text/javascript" th:src="@{/uploadfy/jquery.uploadify.js}"></script>
+<!--上传图片-->
+<script type="text/javascript" th:inline="javascript">
+    var tb;
+    /*var sessionUser = [[${session.login_back_session}]];*/
+
+    $(function () {
+        /*  var Popupe = new PopupBase();
+         Popupe.show('.ph_wareBox', '.Js_btn', '.maskBox,.DeterBox');
+         Popupe.showHide('.subQuemit', '.refundBox,.deliverBox,.menuTreeBox', '.SucBox');
+         Popupe.show('.ph_snbBtn,.ph_wareBox', '.Js_deliver', '.maskBox,.deliverBox');
+         Popupe.show('.ph_wareBox', '.Js_menuTree', '.maskBox,.menuTreeBox');
+         Popupe.hide('.close', '.maskBox,.DeterBox,.SucBox,.deliverBox,.menuTreeBox');*/
+        tb = $('#example').DataTable({
+            "lengthChange": false,
+            "ordering": false,
+            "searching": false,
+            "bServerSide": true,
+            "autoWidth": false,
+            "sPaginationType": "full_numbers",
+            "bJQueryUI": true,
+            "sDom": '<"">t<"F"ip>',
+            "sAjaxSource": "/pc/view/syxPayView/list", //ajax调用接口===============================调用接口=====================================
+            "aoColumnDefs": [{sDefaultContent: '', aTargets: ['_all']}],
+            "aoColumns": [
+                {"sWidth": "50px", "sTitle": "序号", "mData": "id", "title": "id"},
+                {"sTitle": "项目名称", "mData": "name", "class": "sClass"},
+                {"sTitle": "接口名称", "mData": "service", "class": "sClass"},
+                {"sTitle": "商户号", "mData": "merchant_id", "class": "sClass"},
+                {"sTitle": "签名类型", "mData": "sign_type", "class": "sClass"},
+                {"sTitle": "参数编码", "mData": "input_charset", "class": "sClass"},
+                {
+                    "sWidth": "110px",
+                    "sTitle": "操作",
+                    "mData": "id",
+                    "sClass": "ph_tableShow",
+                    "mRender": function (data, type, full) {
+                        var text = '<div class="ph_operateBox"><input class="ph_operate" name="" type="button" value="操作选项">';
+                        text = text + '<ul class="ph_operateList hide" role="menu">';
+                        text += '<li ><div class="temp_data" style="display:none">'+ JSON.stringify(full) +'</div><a href="#" onclick="editById(this);">查看</a> </li>';
+                        text += '<li ><div class="temp_data" style="display:none">'+ JSON.stringify(full) +'</div><a href="#" onclick="enableById(this);">修改</a> </li>';
+                        text = text + '</ul></div>';
+                        return text;
+                    }
+                }
+            ],
+            "oLanguage": {
+                "sProcessing": "数据加载中······",
+                "sLengthMenu": "显示 _MENU_ 条记录",
+                "sZeroRecords": "没有您要搜索的内容！",
+                "sEmptyTable": "列表中无数据存在！",
+                "sInfo": "当前显示 _START_ 到 _END_ 条数据，共 _TOTAL_ 条数据",
+                "sInfoEmpty": "显示 0 到 0 条记录",
+                "sInfoFiltered": "数据列表中共  _MAX_ 条记录",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上一页",
+                    "sNext": "下一页",
+                    "sLast": "末页"
+                }
+            },
+            "fnServerData": function (sSource, aoData, fnCallback, oSettings) {
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "GET",
+                    "async": 'false',
+                    "url": sSource,
+                    "data": {
+                        'pageNum': (aoData[3].value / aoData[4].value) + 1,
+                        'pageSize': aoData[4].value,
+                        'id': $("#id").val(),
+                        'roleName': $("#roleName").val(),
+                        'status': $('#selectStatus').val()
+                    },
+                    "success": fnCallback
+                });
+            },
+            "fnDrawCallback": function () {
+                var api = this.api();
+                var startIndex = api.context[0]._iDisplayStart;//获取到本页开始的条数
+                api.column(0).nodes().each(function (cell, i) {
+                    cell.innerHTML = startIndex + i + 1;
+                });
+
+            }
+        });
+        //验证初始化
+        $('#addLogisticForm').validationEngine({
+            promptPosition: 'bottomLeft'
+            , autoPositionUpdate: false
+            , addPromptClass: 'formError-text'
+            , autoHidePrompt: true
+            , autoHideDelay: 3000
+            , fadeDuration: 0.3
+        });
+    });
+
+    function reset() {
+        $("#selectStatus").selectpicker('val', "");
+        $("#selectForm")[0].reset();
+
+    }
+
+    //查看
+    function editById(self) {
+        var temp = $(self).prev(".temp_data").html()
+        var data = JSON.parse(temp);
+        $("#gateway2").val(data.gateway);
+        $("#notify_url2").val(data.notify_url);
+        $("#return_url2").val(data.return_url);
+        $("#verifyway2").val(data.verifyway);
+        $("#publicSign2").val(data.public_sign);
+        $("#privateSign2").val(data.private_sign);
+        $("#queryUrl2").val(data.query_url);
+        layer.open({
+            type: 1,
+            title: '查看',
+            closeBtn: 0,
+            area: ['600px', '500px'],
+            btn: ['确定'],
+            btnAlign: 'c',
+            content: $('#findLinkmanBox'),
+            yes: function (index, layero) {
+                layer.close(index);
+            }
+        });
+    }
+    //编辑商银信支付配置
+    function enableById(self) {
+        var temp = $(self).prev(".temp_data").html()
+        var data = JSON.parse(temp);
+        $("#id").val(data.id);
+        $("#inputCharset").val(data.input_charset);
+        $("#merchantId").val(data.merchant_id);
+        $("#notifyUrl").val(data.notify_url);
+        $("#returnUrl").val(data.return_url);
+        $("#service").val(data.service);
+        $("#signType").val(data.sign_type);
+        $("#verifyway").val(data.verifyway);
+        $("#privateSign").val(data.private_sign);
+        $("#publicSign").val(data.public_sign);
+        $("#gateway").val(data.gateway);
+        $("#queryUrl").val(data.query_url);
+        var selectName = data.name;
+        $.ajax({
+            type: 'POST',
+            url: '/pc/view/syxPayView/findSystemForm',
+            success: function (json) {
+                var data = $.parseJSON(json)
+                if (data.code == 1) {
+                    var systemFormList2 = data.content
+                    var paystr = '<select><option value="">请选择</option>';
+                    $.each(systemFormList2, function (i, object) {
+                        if(object.name ==selectName ){
+                            paystr += '<option value="' + object.name + '" selected="selected">' + object.name + '</option>';
+                        }else {
+
+                            paystr += "<option value='" + object.name + "'>" + object.name + "</option>";
+                        }
+                    });
+                    paystr += '</select>';
+                    $("#systemFormList").html(paystr);
+                } else {
+                    layer.alert(data.message, {
+                        icon: 2,
+                        title: '获取下拉菜单失败',
+                        closeBtn: 0,
+                        btnAlign: 'c'
+                    });
+                    return false;
+                }
+            }
+        });
+
+        layer.open({
+            type: 1,
+            title: '修改商银信支付配置',
+            closeBtn: 0,
+            area: ['600px', '500px'],
+            btn: ['保存', '取消'],
+            btnAlign: 'c',
+            content: $('#addLinkmanBox'),
+            btn1: function (index) {
+                var flag = $("#addLogisticForm").validationEngine("validate");
+                if (!flag) {
+                    return false;
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "/pc/view/syxPayView/updateOrSave",
+                    data: $("#addLogisticForm").serialize(),
+                    success: function (json) {
+                        d = eval("(" + json + ")");
+                        console.log(d);
+                        if (d.code == 1) {
+                            tb.draw(false);
+                            layer.alert("修改成功！", {
+                                icon: 1,
+                                title: '提示',
+                                closeBtn: 0,
+                                btnAlign: 'c'
+                            });
+                        } else {
+                            layer.alert(d.msg, {
+                                icon: 2,
+                                title: '失败',
+                                closeBtn: 0,
+                                btnAlign: 'c'
+                            });
+                        }
+                    }
+                });
+
+                $('#addLogisticForm')[0].reset()
+                layer.close(index);
+            },
+            btn2: function (index) {
+                //清空表单
+                $('#addLogisticForm')[0].reset()
+                layer.close(index);
+            }
+        });
+    }
+
+
+    //添加商银信支付配置
+    $('.ph_snbBtn').on('click', '.Js_addLogistic', function () {
+        clearData();
+        $.ajax({
+            type: 'POST',
+            url: '/pc/view/syxPayView/findSystemForm',
+            success: function (json) {
+                var data = $.parseJSON(json)
+                if (data.code == 1) {
+                    var systemFormList2 = data.content
+                    //alert(systemFormList2)
+                    var paystr = '<option value="">请选择</option>';
+                    $.each(systemFormList2, function (i, object) {
+                        paystr += "<option value='" + object.name + "'>" + object.name + "</option>";
+                    });
+//                    paystr += '</select>';
+                    $("#systemFormList").html(paystr);
+                } else {
+                    layer.alert(data.message, {
+                        icon: 2,
+                        title: '获取下拉菜单失败',
+                        closeBtn: 0,
+                        btnAlign: 'c'
+                    });
+                    return false;
+                }
+            }
+        });
+
+        layer.open({
+            type: 1,
+            title: '添加商银信支付配置',
+            closeBtn: 0,
+            area: ['600px', '500px'],
+            btn: ['确定', '取消'],
+            yes: function (index, layero) {
+                var flag = $("#addLogisticForm").validationEngine("validate");
+                if (flag) {
+                    var params = $("#addLogisticForm").serialize();
+                    $.ajax({
+                        url: '/pc/view/syxPayView/updateOrSave',
+                        type: 'post',
+                        data: params,
+                        dataType: 'json',
+                        success: function (json) {
+                            if (json.code == 1) {
+                                tb.draw(false);
+                                layer.alert("添加成功！", {
+                                    icon: 1,
+                                    title: '提示',
+                                    closeBtn: 0,
+                                    btnAlign: 'c'
+                                });
+                            } else {
+                                layer.alert(json.msg, {
+                                    icon: 2,
+                                    title: '添加失败',
+                                    closeBtn: 0,
+                                    btnAlign: 'c'
+                                });
+                            }
+                        }
+                    })
+                    $('#addLogisticForm')[0].reset()
+                    layer.close(index);
+                }
+                btn2: function a(index) {
+                    //清空表单
+                    $('#addLogisticForm')[0].reset()
+                    layer.close(index);
+                }
+            },
+            btnAlign: 'c',
+            content: $('#addLinkmanBox')
+        });
+    });
+
+    function clearData() {
+        $("#addLogisticForm")[0].reset();
+    }
+
+    //鼠标悬浮，清空title所有数据
+    $("#example").on("mouseenter",".ph_tableShow",function(){
+        $(this).attr("title","")
+    })
+    // 原生写法 js 实现匹配空格删除
+    var mer_url = document.getElementsByTagName('input');
+    for (var i = 0; i < mer_url.length; i++) {
+        mer_url[i].onblur = function() {
+            //   console.log();
+            this.value = Trim(this.value);
+        };
+    }
+
+    // 监测空格函数 如果有空格替换成空
+    function Trim(str) {
+        return str.replace(/\s+/g,"");
+    }
+
+</script>
+</body>
+</html>

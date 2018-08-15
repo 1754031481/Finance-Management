@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.logs.LoginOperatingLogsMapper">
+
+   <!-- 获取列表数据 -->
+    <select id="getLoginOperatingListPage" resultType="com.zc.entity.logs.LoginOperatingLogs">
+        SELECT id,create_user AS createUser, created_time AS createdTime,
+        created_ip AS createdIp, operation_logs AS operationLogs
+        FROM `login_operating_logs`
+        WHERE 1 = 1
+        <if test="createUser != null">
+            AND create_user = #{createUser}
+        </if>
+        <if test="createdTime != null">
+            AND DATE_FORMAT(created_time,'%Y-%m-%d') = DATE_FORMAT(#{createdTime},'%Y-%m-%d')
+        </if>
+        order by created_time desc
+    </select>
+
+</mapper>

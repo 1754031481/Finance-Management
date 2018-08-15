@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.syxconfig.SyxCashConfigMapper">
+
+    <sql id="baseSelect">
+		SELECT
+		id,
+	   format,
+	   input_charset,
+	   merchant_id,
+	   name,
+	   pay_method,
+	   private_sign,
+	   public_sign,
+	   queryurl,
+	   return_url,
+	   service,
+	   sign_type,
+	   url
+	</sql>
+
+
+    <select id="findSyxCashList" resultType="map" >
+        <include refid="baseSelect"/>  FROM syx_cash_config   ORDER BY created_time DESC
+    </select>
+
+
+
+
+    <update id="updateSyxCashConfig" parameterType="com.zc.entity.syxconfig.SYXCashConfig">
+       UPDATE syx_cash_config
+        <set>
+            <if test="url != null">url=#{url},</if>
+            <if test="queryurl != null">queryurl=#{queryurl},</if>
+            <if test="name != null">name=#{name},</if>
+            <if test="service != null">service=#{service},</if>
+            <if test="format != null">format=#{format},</if>
+            <if test="merchantId != null">merchant_id=#{merchantId},</if>
+            <if test="signType != null">sign_type=#{signType},</if>
+            <if test="inputCharset != null">input_charset=#{inputCharset},</if>
+            <if test="returnUrl != null">return_url=#{returnUrl},</if>
+            <if test="payMethod != null">pay_method=#{payMethod},</if>
+            <if test="publicSign != null">public_sign=#{publicSign},</if>
+            <if test="privateSign != null">private_sign=#{privateSign},</if>
+        </set>
+        WHERE   id = #{id}
+    </update>
+
+  <!--  <select id="findSystemForm" resultType="Map">
+        SELECT  name FROM  system_from
+    </select>-->
+
+</mapper>

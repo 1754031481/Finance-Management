@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.thiredpaytype.ThiredPayTypeMapper">
+
+    <sql id="baseSelect">
+		SELECT
+		  id,
+          common_pay_config_id,
+          pay_config_id,
+          system_from_id,
+          third_pay_type_name,
+          inter_face_id
+	</sql>
+
+    <select id="getThirdPayTypeWhyIidAndSid" resultType="com.zc.entity.thirdpaytype.ThirdPayType">
+        SELECT
+		  id,
+          common_pay_config_id commonPayConfigId,
+          pay_config_id payConfigId,
+          system_from_id systemFromId,
+          third_pay_type_name thirdPayTypeName,
+          inter_face_id interFaceId FROM third_pay_type WHERE inter_face_id = #{interFaceId}  AND system_from_id = #{systemFormId}
+    </select>
+
+    <select id="findThirdPayType" parameterType="java.lang.String" resultType="java.util.Map" >
+        SELECT i.id iid,s.id sid,c.id cid, t.id tid, s.system_from_name,c.`name` commName,s.`name` sysName,t.third_pay_type_name,t.pay_config_id,i.`name` interFaceName
+        FROM ((third_pay_type  t INNER JOIN common_pay_config c  ON t.common_pay_config_id = c.id) INNER JOIN system_from s ON s.id = t.system_from_id)
+        INNER JOIN interface_entity i ON i.id=t.inter_face_id
+        <if test='type=="1"'>
+            where `type`=1
+        </if>
+        <if test='type=="0"'>
+            where `type`=0
+        </if>
+        ORDER BY t.created_time DESC
+    </select>
+
+    <select id="findThirdPayTypeList" resultType="Map">
+        <include refid="baseSelect"/> FROM  third_pay_type   ORDER BY created_time DESC
+    </select>
+
+    <update id="updateThirdPayType" parameterType="com.zc.entity.thirdpaytype.ThirdPayType">
+        UPDATE third_pay_type
+        <set>
+            <if test="commonPayConfigId != null">common_pay_config_id=#{commonPayConfigId},</if>
+            <if test="payConfigId != null">pay_config_id=#{payConfigId},</if>
+            <if test="systemFromId != null">system_from_id=#{systemFromId},</if>
+            <if test="thirdPayTypeName != null">third_pay_type_name=#{thirdPayTypeName},</if>
+            <if test="interFaceId != null">inter_face_id=#{interFaceId},</if>
+        </set>
+        WHERE   id = #{id}
+    </update>
+
+
+
+
+</mapper>

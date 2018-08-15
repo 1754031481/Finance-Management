@@ -1,0 +1,21 @@
+eureka:
+  instance:
+    hostname: localhost
+    preferIpAddress: true
+  server:
+    peerEurekaNodesUpdateIntervalMs: 60000
+    enableSelfPreservation: false
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8762/eureka/
+    healthcheck:
+      enabled: true
+    eurekaServiceUrlPollIntervalSeconds: 60
+    register-with-eureka: false
+    fetch-registry: false
+
+endpoints:
+  health:
+    sensitive: false
+
+

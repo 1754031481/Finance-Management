@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+>
+
+<head>
+    <meta charset="UTF-8">
+    <title>激活接口配置列表</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common/models.css}">
+    <!--bootstrap-select  css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/bootstrapselect/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/bootstrapselect/css/bootstrap-select.css}"/>
+    <!--文件树插件 css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/ztree/zTreeStyle.css}">
+    <style>
+        #filename {
+            width: 67px !important;
+        }
+
+        #SWFUpload_0 {
+            width: 67px !important;
+        }
+
+        #filename-button {
+            background-repeat: no-repeat;
+            width: 67px !important;
+        }
+        #chose{
+            font-size: 14px;
+            color: #555555;
+            vertical-align: middle;
+            height: 44px;
+            line-height: 22px;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+
+</head>
+<body>
+<div class="MainContent">
+    <!--面包屑-->
+    <div class="current">当前位置：<a href="#">接口支持</a>&nbsp;&gt;&nbsp;<span>添加代付接口</span></div>
+    <!--end 面包屑-->
+    <!--主体内容-->
+    <div class="MainCont">
+        <!--标题-->
+
+        <div class="ph_subTit">
+            <h2>接口列表</h2>
+            <!--<shiro:hasPermission name="topicAdd">-->
+            <div class="ph_snbBtn">
+                <input class="Js_addLogistic" name="" type="button" value="添加">
+            </div>
+            <!--</shiro:hasPermission>-->
+        </div><br>
+        <div id="chose">
+            <span >接口类型: </span>&nbsp&nbsp
+            <span><input type="radio" onclick="toAll()">全部接口  </span>&nbsp&nbsp
+            <span><input type="radio"checked="checked">代付接口  </span>&nbsp&nbsp
+            <span><input type="radio"  onclick="toPay()">支付接口  </span>
+        </div>
+        <!--end 标题-->
+        <!--丰付代付配置列表-->
+        <div class="ph_wareBox">
+            <table class="ph_wareList" id="example"></table>
+        </div>
+        <!--end 丰付代付配置列表-->
+    </div>
+    <!--end 主体内容-->
+</div>
+
+
+<!--添加配置弹窗-->
+<div class="PopupBox" id="addLinkmanBox">
+    <!--关闭按钮-->
+    <a href="javascript: void(0);" class="close"></a>
+    <!--end 关闭按钮-->
+    <!--内容-->
+    <div class="PopupCon">
+        <div class="ph_subPoCon ph_screen">
+            <form class="form-inline" id="addLogisticForm">
+                <table class="ph_tableBox">
+                    <input id="id" name="id" hidden="hidden"/>
+                    <input id="type" name="type" hidden="hidden" value="1"/>
+
+                    <!-- <tr>
+                         <th><span class="require">*</span>接口名称：</th>
+                         <td>
+                             <select  id="name2" class="validate[required,min[1],maxSize[100]">
+                                 <option value="">请选择</option>
+                                 <option value="易联支付">易联支付</option>
+                                 <option value="易联代付">易联代付</option>
+                                 <option value="贵州银联代付">贵州银联代付</option>
+                                 <option value="微信支付">微信支付</option>
+                                 <option value="支付宝支付">支付宝支付</option>
+                                 <option value="银生宝支付">银生宝支付</option>
+                                 <option value="银生宝代付">银生宝代付</option>
+                                 <option value="商银信支付">商银信支付</option>
+                                 <option value="商银信代付">商银信代付</option>
+                                 <option value="宝付支付">宝付支付</option>
+                                 <option value="宝付代付">宝付代付</option>
+                                 <option value="衫德支付">衫德支付</option>
+                                 <option value="衫德代付">衫德代付</option>
+                                 <option value="支付宝支付">支付宝支付</option>
+                             </select>-->
+                    </td>
+                    </tr>
+
+                    <tr>
+                        <th><span class="require">*</span>项目名称：</th>
+                        <td><input name="name" type="text" id="name" class="validate[required,min[1],maxSize[50]"></td>
+                    </tr>
+                   <!-- <tr>
+                        <th><span class="require">*</span>接口类型：</th>
+                        <td><select id="type" name="type" value="" class="validate[required,min[0],maxSize[50]" onchange="change()">
+                            <option value="">请选择</option>
+                            <option value="0" >支付</option>
+                            <option value="1" >代付</option>
+                        </select>
+                        </td>
+                    </tr>-->
+                    <tr>
+                        <th><span class="require">*</span>渠道地址：</th>
+                        <td><input name="address" type="text" id="address" class="validate[required,min[1],maxSize[200]">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>渠道异步地址：</th>
+                        <td><input name="addressReturn" type="text" id="addressReturn"
+                                   class="validate[required,min[1],maxSize[200]"></td>
+                    </tr>
+
+                    <tr>
+                        <th><span class="require">*</span>渠道作业地址：</th>
+                        <td><input name="crsTaskAddress" type="text" id="crsTaskAddress"
+                                   class="validate[required,min[1],maxSize[200]"></td>
+                    </tr>
+
+                    <tr>
+                        <th><span class="require">*</span>回调地址：</th>
+                        <td><input name="returnAddress" type="text" id="returnAddress"
+                                   class="validate[required,min[1],maxSize[200]"></td>
+                    </tr>
+
+                    <tr>
+                        <th><span class="require">*</span>渠道公钥：</th>
+                        <td><input name="channelPublicKey" type="text" id="channelPublicKey"
+                                   class="validate[required,min[1],maxSize[3000]"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>权重：</th>
+                        <td><input name="weight" type="text" id="weight" class="validate[required,custom[number],funcCall[secondMoney3]]">
+                        </td>
+                    </tr>
+                    <!--<tr>
+                        <th><span class="require">*</span>周限额：</th>
+                        <td><input name="weekLimitMoney" type="text" id="weekLimitMoney"
+                                   class="validate[required,custom[number],funcCall[secondMoney2]]" ></td>
+                    </tr>-->
+                    <tr>
+                        <th><span class="require">*</span>日限额：</th>
+                        <td><input name="DayLimitMoney" type="text" id="weekLimitDayMoney"
+                                   class="validate[required,custom[number],funcCall[secondMoney]]"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>是否支持渠道：</th>
+                        <td><input name="supportStatue" type="radio" value="0"   id="yes1"> 支持
+                            <input name="supportStatue"  type="radio" value="1"   checked="checked" id="no1"> 不支持
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>设为final渠道：</th>
+                        <td><input name="isFinal" type="radio" value="0"   id="finalYes"> 是
+                            <input name="isFinal"  type="radio" value="1"   checked="checked" id="finalNo"> 否
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>是否分流：</th>
+                        <td><input name="isShunting" type="radio" value="true" id="yes2"> 支持
+                            <input name="isShunting" type="radio" value="false"  checked="checked" id="no2"> 不支持
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+
+    </div>
+    <!--end 内容-->
+</div>
+
+
+<!-- 查看弹窗-->
+<div class="PopupBox" id="findLinkmanBox">
+    <!--关闭按钮-->
+    <a href="javascript: void(0);" class="close"></a>
+    <!--end 关闭按钮-->
+    <!--内容-->
+    <div class="PopupCon">
+        <div class="ph_subPoCon ph_screen">
+            <form class="form-inline" id="addFindLogisticForm">
+                <table class="ph_tableBox">
+                    <tr>
+                        <th><span class="require">*</span>渠道地址：</th>
+                        <td><textarea id="address2"  disabled="true"></textarea></td>
+                    </tr>
+
+                    <tr>
+                        <th><span class="require">*</span>渠道异步地址：</th>
+                        <td>
+                            <textarea id="address_return2"  disabled="true"></textarea></td>
+                    </tr>
+                    <tr>
+                         <th><span class="require">*</span>渠道作业地址：</th>
+                         <td>
+                             <textarea id="crs_task_address2"  disabled="true"></textarea></td>
+                     </tr>
+
+                    <tr>
+                        <th><span class="require">*</span>回调地址：</th>
+                        <td><textarea id="returnAddress2"  disabled="true"></textarea> </td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>渠道公钥：</th>
+                        <td><textarea id="channel_public_key2"  disabled="true"></textarea>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <!--end 内容-->
+</div>
+<!--end查看弹窗-->
+
+
+<!--遮罩层-->
+<div class="maskBox"></div>
+</div>
+
+<!--操作框 -->
+<div id="handle">
+</div>
+<!--end 操作框-->
+
+<script type="text/javascript" th:src="@{/js/common/jquery-1.11.1.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/common/index.js}"></script>
+<!--bootstrap-select-->
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/bootstrap-select.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/select.js}"></script>
+<!--分页-->
+<script type="text/javascript" th:src="@{/js/plugins/pages/jquery.dataTables.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/layer/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/spm/spmExtends.js}"></script>
+<!--bootstrap-select-->
+
+<!-- 验证 -->
+<script type="text/javascript" th:src="@{/js/plugins/validat/jquery.validationEngine.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/validat/jquery.validationEngine-zh_CN.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/common/util.js}"></script>
+
+<!--文件树插件-->
+<!--<script type="text/javascript" th:src="@{/static/js/plugins/ztree/jquery-1.4.4.min.js}"></script>-->
+<script type="text/javascript" th:src="@{/js/plugins/ztree/jquery.ztree.core.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/ztree/jquery.ztree.excheck.min.js}"></script>
+<script type="text/javascript" th:src="@{/uploadfy/jquery.uploadify.js}"></script>
+<!--上传图片-->
+<script type="text/javascript" th:inline="javascript">
+    var tb;
+    /*var sessionUser = [[${session.login_back_session}]];*/
+
+    $(function () {
+
+        /*  var Popupe = new PopupBase();
+         Popupe.show('.ph_wareBox', '.Js_btn', '.maskBox,.DeterBox');
+         Popupe.showHide('.subQuemit', '.refundBox,.deliverBox,.menuTreeBox', '.SucBox');
+         Popupe.show('.ph_snbBtn,.ph_wareBox', '.Js_deliver', '.maskBox,.deliverBox');
+         Popupe.show('.ph_wareBox', '.Js_menuTree', '.maskBox,.menuTreeBox');
+         Popupe.hide('.close', '.maskBox,.DeterBox,.SucBox,.deliverBox,.menuTreeBox');*/
+        tb = $('#example').DataTable({
+            "lengthChange": false,
+            "ordering": false,
+            "searching": false,
+            "bServerSide": true,
+            "autoWidth": false,
+            "sPaginationType": "full_numbers",
+            "bJQueryUI": true,
+            "sDom": '<"">t<"F"ip>',
+            "sAjaxSource": "/pc/view/interfacesupport/list", //ajax调用接口
+            "aoColumnDefs": [{sDefaultContent: '', aTargets: ['_all']}],
+            "aoColumns": [
+                {"sWidth": "50px", "sTitle": "序号", "mData": "id", "title": "id"},
+                {"sTitle": "项目名称", "mData": "name", "class": "sClass"},
+                /*{
+                    "sTitle": "接口类型", "mData": "type", "class": "sClass", "mRender": function (data, type, full) {
+                    var text;
+                    if (full.type == '0') {
+                        text = "支付接口";
+                    } else if (full.type == '1') {
+                        text = "代付接口";
+                    }
+                    return text;
+                }
+                },*/
+                {
+                    "sTitle": "是否支持渠道",
+                    "mData": "support_statue",
+                    "class": "sClass",
+                    "mRender": function (data, type, full) {
+                        var text;
+                        if (full.support_statue == null || full.support_statue == "0") {
+                            text = "支持";
+                        } else {
+                            text = "不支持";
+                        }
+                        return text;
+                    }
+                },
+
+
+                {
+                    "sTitle": "是否分流",
+                    "mData": "is_shunting",
+                    "class": "sClass",
+                    "mRender": function (data, type, full) {
+                        var text;
+                            if (full.is_shunting_cash == 'true') {
+                                text = "分流";
+                            } else if(full.is_shunting_cash == 'final'){
+                                text = "final渠道";
+                            }else {
+                                text = "不分流";
+                            }
+
+
+
+                        return text;
+                    }
+                },
+                {"sTitle": "权重", "mData": "weight", "class": "sClass","mRender": function (data, type, full) {
+                    var text;
+
+                    if (full.type == '1') {
+                        text=full.weight_cash;
+                    } else {
+                        text=full.weight;
+                    }
+                    return text;
+                }},
+               /* {"sTitle": "周限额", "mData": "week_limit_money", "class": "sClass",
+                    "mRender": function (data, type, full) {
+                        var text;
+                        if (full.type == '1') {
+                            text="暂无";
+                        } else {
+                            text=(full.week_limit_money / 100).toFixed(2);
+                        }
+                        return text;
+                    }},
+*/
+
+                {"sTitle": "日限额", "mData": "day_limit_money", "class": "sClass","mRender": function (data, type, full) {
+                    var text;
+
+                    if (full.type == '0') {
+                        text="暂无";
+                    } else {
+                        text=(full.day_limit_money / 100).toFixed(2);
+                    }
+                    return text;
+                }},
+                {
+                    "sWidth": "110px",
+                    "sTitle": "操作",
+                    "mData": "id",
+                    "sClass": "ph_tableShow",
+                    "mRender": function (data, type, full) {
+                        var text = '<div class="ph_operateBox"><input class="ph_operate" name="" type="button" value="操作选项">';
+                        text = text + '<ul class="ph_operateList hide" role="menu">';
+                        text += '<li ><div class="temp_data" style="display:none">'+ JSON.stringify(full) +'</div><a href="#" onclick="editById(this);">查看</a> </li>';
+                        text += '<li ><div class="temp_data" style="display:none">'+ JSON.stringify(full) +'</div><a href="#" onclick="enableById(this);">修改</a> </li>';
+                        text = text + '</ul></div>';
+                        return text;
+                    }
+                }
+            ],
+            "oLanguage": {
+                "sProcessing": "数据加载中······",
+                "sLengthMenu": "显示 _MENU_ 条记录",
+                "sZeroRecords": "没有您要搜索的内容！",
+                "sEmptyTable": "列表中无数据存在！",
+                "sInfo": "当前显示 _START_ 到 _END_ 条数据，共 _TOTAL_ 条数据",
+                "sInfoEmpty": "显示 0 到 0 条记录",
+                "sInfoFiltered": "数据列表中共  _MAX_ 条记录",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上一页",
+                    "sNext": "下一页",
+                    "sLast": "末页"
+                }
+            },
+            "fnServerData": function (sSource, aoData, fnCallback, oSettings) {
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "GET",
+                    "async": 'false',
+                    "url": sSource,
+                    "data": {
+                        'pageNum': (aoData[3].value / aoData[4].value) + 1,
+                        'pageSize': aoData[4].value,
+                        'id': $("#id").val(),
+                        'roleName': $("#roleName").val(),
+                        'status': $('#selectStatus').val(),
+                        'type':'1',
+                    },
+                    "success": fnCallback
+                });
+            },
+            "fnDrawCallback": function () {
+                var api = this.api();
+                var startIndex = api.context[0]._iDisplayStart;//获取到本页开始的条数
+                api.column(0).nodes().each(function (cell, i) {
+                    cell.innerHTML = startIndex + i + 1;
+                });
+
+            }
+        });
+        //验证初始化
+        $('#addLogisticForm').validationEngine({
+            promptPosition: 'bottomLeft'
+            , autoPositionUpdate: false
+            , addPromptClass: 'formError-text'
+            , autoHidePrompt: true
+            , autoHideDelay: 3000
+            , fadeDuration: 0.3
+        });
+    });
+
+    function reset() {
+        $("#selectStatus").selectpicker('val', "");
+        $("#selectForm")[0].reset();
+
+    }
+
+
+    //查看
+    function editById(self) {
+        var temp = $(self).prev(".temp_data").html()
+        var tempObj = JSON.parse(temp);
+        $("#address2").val(tempObj.address);
+        $("#address_return2").val(tempObj.address_return);
+        $("#crs_task_address2").val(tempObj.crs_task_address);
+        $("#channel_public_key2").val(tempObj.channel_public_key);
+        $("#returnAddress2").val(tempObj.returnAddress);
+        layer.open({
+            type: 1,
+            title: '查看',
+            closeBtn: 0,
+            area: ['600px', '500px'],
+            btn: ['确定'],
+            btnAlign: 'c',
+            content: $('#findLinkmanBox'),
+            yes: function (index, layero) {
+                layer.close(index);
+            }
+        });
+    }
+
+    //编辑接口
+    function enableById(self) {
+        var temp = $(self).prev(".temp_data").html()
+        var tempObj = JSON.parse(temp);
+        $("#id").val(tempObj.id);
+        $("#name").val(tempObj.name);
+        $("#type").val(tempObj.type);
+        if(tempObj.support_statue=="0" || tempObj.support_statue=="null"){
+            $("#yes1").prop("checked", true);
+            $("#no1").prop("checked", false);
+        }
+        $("#address").val(tempObj.address);
+        $("#channelPublicKey").val(tempObj.channel_public_key);
+        $("#addressReturn").val(tempObj.address_return);
+        $("#crsTaskAddress").val(tempObj.crs_task_address);
+        $("#returnAddress").val(tempObj.returnAddress);
+        /*var ww =  tempObj.week_limit_money/100;
+        $("#weekLimitMoney").val(ww);*/
+        //$("#weekLimitDayMoney").val(day_limit_money);
+        var ww =  tempObj.day_limit_money/100;
+        $("#weekLimitDayMoney").val(ww);
+
+      //  if(tempObj.type==1){
+            $("#weight").val(tempObj.weight_cash);
+            $("#weekLimitMoney").val("");
+            //document.getElementById("weekLimitMoney").disabled="disabled"
+            //document.getElementById("weekLimitDayMoney").disabled=""
+        /*}else{
+            $("#weight").val(tempObj.weight);
+            $("#weekLimitDayMoney").val("");
+            document.getElementById("weekLimitDayMoney").disabled="disabled"
+            document.getElementById("weekLimitMoney").disabled=""
+        }*/
+       /* if(tempObj.type==0){
+            if(tempObj.is_shunting == "true"){
+                $("#yes2").prop("checked", true);
+                $("#no2").prop("checked", false);
+            }
+        }else {*/
+            if(tempObj.is_shunting_cash == "true"){
+
+                $("#yes2").prop("checked", true);
+                $("#no2").prop("checked", false);
+            }
+        if(tempObj.is_shunting_cash == "final"){
+
+            $("#finalYes").prop("checked", true);
+            $("#finalNo").prop("checked", false);
+        }
+       // }
+      //  $("#weekLimitMoney").val(week_limit_money);
+
+
+
+        //$("#dayLimitMoney").val(day_limit_money);
+        $("#isShuntingCash").val(tempObj.is_shunting_cash);
+        $("#weightCash").val(tempObj.weight_cash);
+
+        layer.open({
+            type: 1,
+            title: '修改接口',
+            closeBtn: 0,
+            area: ['600px', '500px'],
+            btn: ['保存', '取消'],
+            btnAlign: 'c',
+            content: $('#addLinkmanBox'),
+            btn1: function (index) {
+                var flag = $("#addLogisticForm").validationEngine("validate");
+                if (!flag) {
+                    return false;
+                }
+               /* var  ss = $("#weekLimitMoney").val();
+                var aa =ss*100;
+                $("#weekLimitMoney").val(aa);*/
+
+                var  ss = $("#weekLimitDayMoney").val();
+                var aa =ss*100;
+                $("#weekLimitDayMoney").val(aa);
+                $.ajax({
+                    type: "POST",
+                    url: "/pc/view/interfacesupport/updateOrSave",
+                    data: $("#addLogisticForm").serialize(),
+                    success: function (json) {
+                        d = eval("(" + json + ")");
+                        console.log(d);
+                        if (d.code == 1) {
+                            tb.draw(false);
+                            layer.alert("修改成功！", {
+                                icon: 1,
+                                title: '提示',
+                                closeBtn: 0,
+                                btnAlign: 'c'
+                            });
+                        } else {
+                            layer.alert('修改成功', {
+                                icon: 2,
+                                title: '失败',
+                                closeBtn: 0,
+                                btnAlign: 'c'
+                            });
+                        }
+                    }
+                });
+
+                $('#addLogisticForm')[0].reset()
+                layer.close(index);
+            },
+            btn2: function (index) {
+                //清空表单
+                $('#addLogisticForm')[0].reset()
+                layer.close(index);
+            }
+        });
+    }
+
+    //添加接口
+    $('.ph_snbBtn').on('click', '.Js_addLogistic', function () {
+        clearData();
+        layer.open({
+            type: 1,
+            title: '添加接口',
+            closeBtn: 0,
+            area: ['600px', '500px'],
+            btn: ['确定', '取消'],
+            yes: function (index, layero) {
+                var flag = $("#addLogisticForm").validationEngine("validate");
+                if (!flag) {
+                    return false;
+                }
+               /* var  ss = $("#weekLimitMoney").val();
+                var aa =ss*100;
+                $("#weekLimitMoney").val(aa);*/
+
+                var  ss = $("#weekLimitDayMoney").val();
+                var aa =ss*100;
+                $("#weekLimitDayMoney").val(aa);
+
+                var params = $("#addLogisticForm").serialize();
+                $.ajax({
+                    url: '/pc/view/interfacesupport/updateOrSave',
+                    type: 'post',
+                    data: params,
+                    dataType: 'json',
+                    success: function (json) {
+//                            alert(JSON.stringify(json.code));
+                        if (json.code == 1) {
+                            tb.draw(false);
+                            layer.alert("添加成功！", {
+                                icon: 1,
+                                title: '提示',
+                                closeBtn: 0,
+                                btnAlign: 'c'
+                            });
+                        } else {
+                            layer.alert('添加失败', {
+                                icon: 2,
+                                title: '添加失败',
+                                closeBtn: 0,
+                                btnAlign: 'c'
+                            });
+                        }
+                    }
+                })
+                $('#addLogisticForm')[0].reset()
+                layer.close(index);
+                btn2: function a(index) {
+                    //清空表单
+                    $('#addLogisticForm')[0].reset()
+                    layer.close(index);
+                }
+            },
+            btnAlign: 'c',
+            content: $('#addLinkmanBox')
+        });
+    });
+
+    function clearData() {
+        $("#addLogisticForm")[0].reset();
+    }
+
+    function change() {
+        var val = $("#type").val();
+        if(val=='1'){
+            $("#weekLimitMoney").val("");
+            document.getElementById("weekLimitMoney").disabled="disabled"
+            document.getElementById("weekLimitDayMoney").disabled=""
+        }else{
+            $("#weekLimitDayMoney").val("");
+            document.getElementById("weekLimitDayMoney").disabled="disabled"
+            document.getElementById("weekLimitMoney").disabled=""
+        }
+    }
+
+    //鼠标悬浮，清空title所有数据
+    $("#example").on("mouseenter",".ph_tableShow",function(){
+        $(this).attr("title","")
+    })
+
+    // 原生写法 js 实现匹配空格删除
+    var mer_url = document.getElementsByTagName('input');
+    for (var i = 0; i < mer_url.length; i++) {
+        mer_url[i].onblur = function() {
+            //   console.log();
+            this.value = Trim(this.value);
+        };
+    }
+
+    // 监测空格函数 如果有空格替换成空
+    function Trim(str) {
+        return str.replace(/\s+/g,"");
+    }
+
+    //数字验证
+    function secondMoney(field, rules, i, options) {
+        var weekLimitDayMoney = $("#weekLimitDayMoney").val();
+        if(!/^\d+(\.\d{1,2})?$/.test(weekLimitDayMoney)){
+            return "小数点后只保留两位";
+        }
+    }
+    function secondMoney2(field, rules, i, options) {
+        var weekLimitMoney = $("#weekLimitMoney").val();
+        if(!/^\d+(\.\d{1,2})?$/.test(weekLimitMoney)){
+            return "小数点后只保留两位";
+        }
+    }
+    function secondMoney3(field, rules, i, options) {
+        var weight = $("#weight").val();
+        if(!/^\d+(\.\d{1,2})?$/.test(weight)){
+            return "小数点后只保留两位";
+        }
+    }
+
+    $(document).on("click","#finalYes",function () {
+        $.ajax({
+            url: '/pc/view/interfacesupport/selectFinalChannel',
+            type: 'post',
+            data: {type:'1'},
+            dataType: 'json',
+            success: function (json) {
+//                            alert(JSON.stringify(json.code));
+                if (json.code == 200) {
+                    tb.draw(false);
+                    var name=json.content;
+                    layer.confirm('设置本渠道为代付final渠道,则原final渠道'+name+'变为普通渠道',{
+                                btn:['确定','取消']
+                            },function (index) {
+                                layer.close(index);
+                            },
+                            function (index) {
+                                layer.close(index);
+                                $('#finalNo').prop("checked","checked");
+                                $('#finalYes').removeProp("checked");
+                            }
+
+                    )
+                } else {
+                    layer.alert('系统繁忙', {
+                        icon: 2,
+                        title: '添加失败',
+                        closeBtn: 0,
+                        btnAlign: 'c'
+                    });
+                    $('#finalNo').prop("checked","checked");
+                    $('#finalYes').removeProp("checked");
+                }
+            }
+        })
+
+    })
+    function toPay() {
+        window.location.href="/pc/view/interfacesupport/toAddPayInterFaceSupport"
+    }
+    function toAll() {
+        window.location.href="/pc/view/interfacesupport/toAddInterFaceSupport"
+    }
+</script>
+</body>
+</html>

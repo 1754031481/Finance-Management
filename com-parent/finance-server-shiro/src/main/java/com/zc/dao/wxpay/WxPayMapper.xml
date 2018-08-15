@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.wxpay.WxPayMapper">
+
+   <!-- 获取列表数据 -->
+    <select id="getWxPayList" resultType="com.zc.entity.finance.WxPayConfig">
+        select `id`,
+        wx_merchant_number as wxMerchantNumber,
+        wx_notifys_address as wxNotifysAddress,
+        wx_notifys_order_address as wxNotifysOrderAddress,
+        wx_open_app_id as wxOpenAppId,
+        wx_publicappid as wxPublicappid,
+        wxkey,
+        system_from_id as systemFromId,
+        `name`,
+        wx_query_order_address as wxQueryOrderAddress
+        from wx_pay_config
+        order by created_time desc
+    </select>
+
+    <!--回显-->
+    <select id="getWxPayById" parameterType="java.lang.Long" resultType="com.zc.entity.finance.WxPayConfig">
+        select `id`,
+        wx_merchant_number as wxMerchantNumber,
+        wx_notifys_address as wxNotifysAddress,
+        wx_notifys_order_address as wxNotifysOrderAddress,
+        wx_open_app_id as wxOpenAppId,
+        wx_publicappid as wxPublicappid,
+        wxkey,
+        system_from_id as systemFromId,
+        `name`,
+        wx_query_order_address as wxQueryOrderAddress
+        from wx_pay_config
+        where id=#{id}
+        limit 1
+    </select>
+
+    <update id="updateWxPay" parameterType="com.zc.entity.finance.WxPayConfig">
+        update wx_pay_config
+        set
+       `name`=#{name},
+       wx_merchant_number=#{wxMerchantNumber},
+       wx_notifys_address=#{wxNotifysAddress},
+       wx_notifys_order_address=#{wxNotifysOrderAddress},
+       wx_open_app_id=#{wxOpenAppId},
+       wx_publicappid=#{wxPublicappid},
+       wxkey=#{wxkey},
+       wx_query_order_address=#{wxQueryOrderAddress},
+       system_from_id=#{systemFromId},
+        update_time=now()
+        where id=#{id}
+    </update>
+
+    <!--获取支持项目下拉框-->
+    <select id="getSelect" resultType="com.zc.vo.SystemFromVO">
+        select `id`,`name` from system_from
+    </select>
+</mapper>

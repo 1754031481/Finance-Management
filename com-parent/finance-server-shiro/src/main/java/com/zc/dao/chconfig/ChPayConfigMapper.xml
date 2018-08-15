@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.chconfig.ChPayConfigMapper">
+
+    <sql id="baseSelect">
+		SELECT
+	  id, create_user, created_ip,
+      created_time, update_time, appid,
+      backurl, businesstype, cashiermode,
+      dog_sk, fronturl, kind,
+      name, root_url, service_id,
+      subject, terminal, toaccountnumber
+	</sql>
+
+    <!--SELECT
+       gate_id gateId ,
+       key_check keyCheck,
+       liq_type liqType,
+       mer_id merId,
+       name name ,
+       req_type reqType,
+       req_url reqUrl,
+       ret_url retUrl,
+       root_url rootUrl,
+       user_id userId,
+       bank_url bankUrl -->
+
+    <select id="findChPayConfig" resultType="map">
+        <include refid="baseSelect"/>  FROM ch_pay_config   ORDER BY created_time DESC
+    </select>
+
+    <select id="findConfig" resultType="Map" parameterType="com.zc.entity.chconfig.ChPayConfig">
+       SELECT id,backurl,fronturl,root_url FROM ch_pay_config  WHERE  id = #{ChPayId}
+    </select>
+
+
+    <update id="updateChPayConfig" parameterType="com.zc.entity.chconfig.ChPayConfig">
+       UPDATE ch_pay_config
+        <set>
+            <if test="appid != null">appid=#{appid},</if>
+            <if test="backurl != null">backurl=#{backurl},</if>
+            <if test="businesstype != null">businesstype=#{businesstype},</if>
+            <if test="cashiermode != null">cashiermode=#{cashiermode},</if>
+            <if test="dogSk != null">dog_sk=#{dogSk},</if>
+            <if test="fronturl != null">fronturl=#{fronturl},</if>
+            <if test="kind != null">kind=#{kind},</if>
+            <if test="name != null">name=#{name},</if>
+            <if test="rootUrl != null">root_url=#{rootUrl},</if>
+            <if test="serviceId != null">service_id=#{serviceId},</if>
+            <if test="subject != null">subject=#{subject},</if>
+            <if test="terminal != null">terminal=#{terminal},</if>
+            <if test="toaccountnumber != null">toaccountnumber=#{toaccountnumber}</if>
+        </set>
+        WHERE   id = #{id}
+    </update>
+    
+    <insert id="addChPayConfig"  parameterType="com.zc.entity.chconfig.ChPayConfig" >
+        INSERT INTO ch_pay_config ( created_time,update_time,appid,backurl,businesstype,cashiermode,dog_sk,fronturl,kind,name,root_url,service_id,subject,terminal,toaccountnumber)
+        VALUES (#{createdTime},#{updateTime},#{appid},#{backurl},#{businesstype},#{cashiermode},#{dogSk},#{fronturl},#{kind},#{name},#{rootUrl},#{serviceId},#{subject},#{terminal},#{toaccountnumber});
+    </insert>
+
+</mapper>

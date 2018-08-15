@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.configuration.YFpayConfigMapper">
+
+    <!--获取裕福渠道支付配置列表-->
+    <select id="getPayList" resultType="com.zc.entity.configuration.YFPayConfig">
+        SELECT id, back_url AS backUrl, front_url AS frontUrl, gw_type AS gwType, merchant_id AS merchantId,
+        merchant_order_currency AS merchantOrderCurrency, merchant_settle_info AS merchantSettleInfo,
+        merchant_user_id AS merchantUserId, private_sign AS privateSign, request_address AS requestAddress,
+        user_type AS userType, version AS version, yufucerp_address AS yufucerpAddress, yufucerp_path AS yufucerpPath,
+        zd_address AS zdAddress
+        FROM `yf_pay_config`
+        ORDER BY created_time DESC
+    </select>
+
+    <!--修改裕福渠道支付配置-->
+    <update id="updatePay" parameterType="com.zc.entity.configuration.YFPayConfig">
+        UPDATE yf_pay_config
+        SET update_time = NOW(), back_url = #{backUrl}, front_url = #{frontUrl}, gw_type = #{gwType}, merchant_id = #{merchantId},
+        merchant_order_currency = #{merchantOrderCurrency}, merchant_settle_info = #{merchantSettleInfo},
+        merchant_user_id = #{merchantUserId},private_sign = #{privateSign}, request_address = #{requestAddress},
+        user_type = #{userType}, yufucerp_address = #{yufucerpAddress},yufucerp_path = #{yufucerpPath},
+        zd_address = #{zdAddress},version = #{version}
+        WHERE id = #{id}
+    </update>
+</mapper>

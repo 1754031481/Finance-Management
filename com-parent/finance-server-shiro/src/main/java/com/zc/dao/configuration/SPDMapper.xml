@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.configuration.SPDMapper">
+
+    <!--获取浦发扫码渠道列表-->
+    <select id="getQRcodeList" resultType="com.zc.entity.configuration.SPDQRcode">
+        SELECT id, detail, keya AS secretKey, mch_id AS merchantId, notify_url AS notifyUrl, trade_type AS tradeType,
+        product_id AS productId, req_url AS reqUrl, simit_pay AS simitPay, spbill_createip AS spbillCreateIp
+        FROM `pf_bank_nativa`
+        ORDER BY created_time DESC
+    </select>
+
+    <!--修改浦发扫码渠道-->
+    <update id="updateQRcode" parameterType="com.zc.entity.configuration.SPDQRcode">
+        UPDATE pf_bank_nativa
+        SET update_time = NOW(), detail = #{detail}, keya = #{secretKey}, mch_id = #{merchantId},
+        notify_url = #{notifyUrl}, trade_type = #{tradeType}, product_id = #{productId}, req_url = #{reqUrl},
+        simit_pay = #{simitPay}, spbill_createip = #{spbillCreateIp}
+        WHERE id = #{id}
+    </update>
+</mapper>

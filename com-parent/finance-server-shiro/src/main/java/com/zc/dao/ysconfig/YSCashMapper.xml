@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.ysconfig.YSCashMapper">
+
+   <!-- 获取列表数据 -->
+    <select id="getYsCashList" resultType="com.zc.entity.ysconfig.YSCashConfig">
+        select
+        id,
+        business_code as businessCode,
+        charset,
+        method,
+        `name`,
+        notify_url as notifyUrl,
+        partner_id as partnerId,
+        private_pfx_mima as privatePfxMima,
+        private_pfx_url as privatePfxUrl,
+        public_cer_url as publicCerUrl,
+        return_url as returnUrl,
+        rsa_name as rsaName,
+        seller_id as sellerId,
+        seller_name as sellerName,
+        sign_type as signType,
+        subject,
+        version,
+        ys_getway_url_df as ysGetwayUrlDf,
+        ys_getway_url_zf as ysGetwayUrlZf
+        from ys_cash_config
+        order by created_time desc
+    </select>
+
+    <!--回显-->
+    <select id="getYsCashById" parameterType="java.lang.Long" resultType="com.zc.entity.ysconfig.YSCashConfig">
+         select
+        id,
+        business_code as businessCode,
+        charset,
+        method,
+        `name`,
+        notify_url as notifyUrl,
+        partner_id as partnerId,
+        private_pfx_mima as privatePfxMima,
+        private_pfx_url as privatePfxUrl,
+        public_cer_url as publicCerUrl,
+        return_url as returnUrl,
+        rsa_name as rsaName,
+        seller_id as sellerId,
+        seller_name as sellerName,
+        sign_type as signType,
+        subject,
+        version,
+        ys_getway_url_df as ysGetwayUrlDf,
+        ys_getway_url_zf as ysGetwayUrlZf
+        from ys_cash_config
+        where id=#{id}
+        limit 1
+    </select>
+
+    <update id="updateYsCash" parameterType="com.zc.entity.ysconfig.YSCashConfig">
+        update ys_cash_config
+        set
+       business_code=#{businessCode},
+        charset=#{charset},
+        method=#{method},
+        `name`=#{name},
+        notify_url=#{notifyUrl},
+        partner_id=#{partnerId},
+        private_pfx_mima=#{privatePfxMima},
+        private_pfx_url=#{privatePfxUrl},
+        public_cer_url=#{publicCerUrl},
+        return_url=#{returnUrl},
+        rsa_name=#{rsaName},
+        seller_id=#{sellerId},
+        seller_name=#{sellerName},
+        sign_type=#{signType},
+        subject=#{subject},
+        version=#{version},
+        ys_getway_url_df=#{ysGetwayUrlDf},
+        ys_getway_url_zf=#{ysGetwayUrlZf},
+        update_time=now()
+        where id=#{id}
+    </update>
+
+    <!--获取支持项目下拉框-->
+    <select id="getSelect" resultType="com.zc.vo.SystemFromVO">
+        select `id`,`name` from system_from
+    </select>
+</mapper>

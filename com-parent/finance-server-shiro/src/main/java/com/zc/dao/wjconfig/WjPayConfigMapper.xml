@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.wjconfig.WjPayConfigMapper">
+
+    <sql id="baseSelect">
+		SELECT
+	  id, create_user,created_ip,created_time,
+	  update_time,name, merchant_no,
+      card_type, order_subject, notify_url,
+      return_url, public_key, request_address,
+      query_address
+	</sql>
+
+
+    <select id="findWjPayConfig" resultType="map">
+        <include refid="baseSelect"/>  FROM wj_pay_config   ORDER BY created_time DESC
+    </select>
+
+    <select id="findConfig" resultType="Map" parameterType="com.zc.entity.wjconfig.WjPayConfig">
+       SELECT id,notify_url,return_url,public_key,request_address,query_address FROM wj_pay_config  WHERE  id = #{WjPayId}
+    </select>
+
+
+    <update id="updateWjPayConfig" parameterType="com.zc.entity.wjconfig.WjPayConfig">
+       UPDATE wj_pay_config
+        <set>
+            <if test="name != null">name=#{name},</if>
+            <if test="merchantNo != null">merchant_no=#{merchantNo},</if>
+            <if test="cardType != null">card_type=#{cardType},</if>
+            <if test="orderSubject != null">order_subject=#{orderSubject},</if>
+            <if test="notifyUrl != null">notify_url=#{notifyUrl},</if>
+            <if test="returnUrl != null">return_url=#{returnUrl},</if>
+            <if test="publicKey != null">public_key=#{publicKey},</if>
+            <if test="requestAddress != null">request_address=#{requestAddress},</if>
+            <if test="queryAddress != null">query_address=#{queryAddress},</if>
+
+        </set>
+        WHERE   id = #{id}
+    </update>
+    
+    <insert id="addWjPayConfig"  parameterType="com.zc.entity.wjconfig.WjPayConfig" >
+        INSERT INTO wj_pay_config ( created_time,update_time,name,merchant_no,card_type,order_subject,notify_url,return_url,public_key,request_address,query_address)
+        VALUES (#{createdTime},#{updateTime},#{name},#{merchantNo},#{cardType},#{orderSubject},#{notifyUrl},#{returnUrl},#{publicKey},#{requestAddress},#{queryAddress});
+    </insert>
+
+</mapper>

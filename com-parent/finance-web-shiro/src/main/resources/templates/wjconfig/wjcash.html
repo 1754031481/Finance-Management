@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+
+<head>
+    <meta charset="UTF-8">
+    <title>维基代付配置列表</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common/models.css}">
+    <!--bootstrap-select  css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/bootstrapselect/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/bootstrapselect/css/bootstrap-select.css}"/>
+    <!--文件树插件 css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/ztree/zTreeStyle.css}">
+    <style>
+        #filename{
+            width: 67px !important;
+        }
+        #SWFUpload_0{
+            width: 67px !important;
+        }
+        #filename-button{
+            background-repeat: no-repeat;
+            width: 67px !important;
+        }
+    </style>
+
+</head>
+<body>
+<div class="MainContent">
+    <!--面包屑-->
+    <div class="current">当前位置：<a href="#">关于配置</a>&nbsp;&gt;&nbsp;<span>维基渠道代付配置</span></div>
+    <!--end 面包屑-->
+    <!--主体内容-->
+    <div class="MainCont">
+        <!--标题-->
+
+        <div class="ph_subTit">
+            <h2>维基代付配置列表</h2>
+            <!--<shiro:hasPermission name="topicAdd">-->
+            <div class="ph_snbBtn">
+                <input class="Js_addLogistic" name="" type="button" value="添加">
+            </div>
+            <!--</shiro:hasPermission>-->
+        </div>
+
+        <!--end 标题-->
+        <!--维基代付配置列表-->
+        <div class="ph_wareBox">
+            <table class="ph_wareList" id="example"></table>
+        </div>
+        <!--end 维基代付付配置列表-->
+    </div>
+    <!--end 主体内容-->
+</div>
+
+
+
+
+<!--添加配置弹窗-->
+<div class="PopupBox"  id="addLinkmanBox">
+    <!--关闭按钮-->
+    <a href="javascript: void(0);" class="close"></a>
+    <!--end 关闭按钮-->
+    <!--内容-->
+    <div class="PopupCon">
+        <div class="ph_subPoCon ph_screen">
+            <form class="form-inline" id="addLogisticForm">
+                <table class="ph_tableBox">
+                    <input id="id" name="id" hidden="hidden"/>
+                    <tr>
+                        <th><span class="require">*</span>配置名称：</th>
+                        <td><input name="name" type="text" id="name" class="validate[required,maxSize[50]]"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>接口名称：</th>
+                        <td><input name="method" type="text" id="method" class="validate[required,maxSize[50]]"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>商户编号：</th>
+                        <td><input name="merchantNo" type="text"  id="merchant_no" class="validate[required,maxSize[50]]"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>支付卡类型：</th>
+                        <td><input name="cardType" type="text" id="card_type" class="validate[required,maxSize[50]]"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>账户类型：</th>
+                        <td><input name="bankAccountType" type="text" id="bank_account_type" class="validate[required,maxSize[50]]"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>订单描述：</th>
+                        <td><input name="orderSubject" type="text" id="order_subject" class="validate[required,maxSize[50]]"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>异步通知地址：</th>
+                        <td><input name="notifyUrl" type="text" id="notify_url" class="validate[required, maxSize[200]]"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>秘钥：</th>
+                        <td><input name="publicKey" type="text" id="public_key" class="validate[required,maxSize[3000]]"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>代付请求地址：</th>
+                        <td><input name="requestAdressDf" type="text" id="request_adress_df" class="validate[required,maxSize[200]]"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>代付查询地址：</th>
+                        <td><input name="queryAddress" type="text" id="query_address" class="validate[required, maxSize[200]]"></td>
+                    </tr>
+
+
+                </table>
+        </div>
+        </form>
+    </div>
+    <!--end 内容-->
+</div>
+<!--end 添加配置弹窗-->
+
+
+<!-- 查看弹窗-->
+<div class="PopupBox"  id="findLinkmanBox">
+    <!--关闭按钮-->
+    <a href="javascript: void(0);" class="close"></a>
+    <!--end 关闭按钮-->
+    <!--内容-->
+    <div class="PopupCon">
+        <div class="ph_subPoCon ph_screen">
+            <form class="form-inline" id="addFindLogisticForm">
+                <table class="ph_tableBox">
+                    <input id="id" name="id" hidden="hidden"/>
+                    <tr>
+                        <th><span class="require">*</span>异步通知地址：</th>
+                        <td><textarea name="notifyUrl" type="text"  id="notifyUrl2"  disabled="true"></textarea></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>秘钥：</th>
+                        <td><textarea name="publicKey" type="text" id="publicKey2" disabled="true"></textarea></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>代付请求地址：</th>
+                        <td><textarea name="requestAdressDf" type="text" id="requestAdressDf2" disabled="true"></textarea></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>代付查询地址：</th>
+                        <td><textarea name="queryAddress" type="text" id="queryAddress2" disabled="true"></textarea></td>
+                    </tr>
+
+                </table>
+        </div>
+        </form>
+    </div>
+    <!--end 内容-->
+</div>
+<!--end查看弹窗-->
+
+
+<!--遮罩层-->
+<div class="maskBox"></div>
+</div>
+
+<!--操作框 -->
+<div id="handle">
+</div>
+<!--end 操作框-->
+
+<script type="text/javascript" th:src="@{/js/common/jquery-1.11.1.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/common/index.js}"></script>
+<!--bootstrap-select-->
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/bootstrap-select.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/select.js}"></script>
+<!--分页-->
+<script type="text/javascript" th:src="@{/js/plugins/pages/jquery.dataTables.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/layer/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/spm/spmExtends.js}"></script>
+<!--bootstrap-select-->
+
+<!-- 验证 -->
+<script type="text/javascript" th:src="@{/js/plugins/validat/jquery.validationEngine.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/validat/jquery.validationEngine-zh_CN.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/common/util.js}"></script>
+
+<!--文件树插件-->
+<!--<script type="text/javascript" th:src="@{/static/js/plugins/ztree/jquery-1.4.4.min.js}"></script>-->
+<script type="text/javascript" th:src="@{/js/plugins/ztree/jquery.ztree.core.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/ztree/jquery.ztree.excheck.min.js}"></script>
+<script type="text/javascript" th:src="@{/uploadfy/jquery.uploadify.js}"></script>
+<!--上传图片-->
+<script type="text/javascript" th:inline="javascript">
+    var tb;
+    /*var sessionUser = [[${session.login_back_session}]];*/
+
+    $(function () {
+      /*  var Popupe = new PopupBase();
+        Popupe.show('.ph_wareBox', '.Js_btn', '.maskBox,.DeterBox');
+        Popupe.showHide('.subQuemit', '.refundBox,.deliverBox,.menuTreeBox', '.SucBox');
+        Popupe.show('.ph_snbBtn,.ph_wareBox', '.Js_deliver', '.maskBox,.deliverBox');
+        Popupe.show('.ph_wareBox', '.Js_menuTree', '.maskBox,.menuTreeBox');
+        Popupe.hide('.close', '.maskBox,.DeterBox,.SucBox,.deliverBox,.menuTreeBox');*/
+        tb = $('#example').DataTable({
+            "lengthChange": false,
+            "ordering": false,
+            "searching": false,
+            "bServerSide": true,
+            "autoWidth": false,
+            "sPaginationType": "full_numbers",
+            "bJQueryUI": true,
+            "sDom": '<"">t<"F"ip>',
+            "sAjaxSource": "/configuration/WJDFConfig/list", //ajax调用接口===============================调用接口=====================================
+            "aoColumnDefs": [{sDefaultContent: '', aTargets: ['_all']}],
+            "aoColumns": [
+                {"sWidth": "50px", "sTitle": "序号", "mData": "id", "title": "id"},
+                {"sTitle": "配置名称", "mData": "name", "class": "sClass"},
+                {"sTitle": "接口名称", "mData": "method", "class": "sClass"},
+                {"sTitle": "商户编号", "mData": "merchant_no", "class": "sClass"},
+                {"sTitle": "支付卡类型", "mData": "card_type","class": "sClass"},
+                {"sTitle": "账户类型", "mData": "bank_account_type","class": "sClass"},
+                {"sTitle": "订单描述", "mData": "order_subject","class": "sClass"},
+
+                {
+                    "sWidth": "110px",
+                    "sTitle": "操作",
+                    "mData": "id",
+                    "sClass": "ph_tableShow",
+                    "mRender": function (data, type, full) {
+                        var text = '<div class="ph_operateBox"><input class="ph_operate" name="" type="button" value="操作选项">';
+                        text = text + '<ul class="ph_operateList hide" role="menu">';
+                        text += '<li >' +
+                            '<div class="temp_data" style="display:none">'+ JSON.stringify(full) +'</div>'+
+                            '<a href="#" onclick="editById(this);">查看</a> </li>';
+                        text += '<li ><div class="temp_data" style="display:none">'+ JSON.stringify(full) +'</div><a href="#" onclick="enableById(this);">修改</a> </li>';
+                        text = text + '</ul></div>';
+                        return text;
+                    }
+                }
+            ],
+            "oLanguage": {
+                "sProcessing": "数据加载中······",
+                "sLengthMenu": "显示 _MENU_ 条记录",
+                "sZeroRecords": "没有您要搜索的内容！",
+                "sEmptyTable": "列表中无数据存在！",
+                "sInfo": "当前显示 _START_ 到 _END_ 条数据，共 _TOTAL_ 条数据",
+                "sInfoEmpty": "显示 0 到 0 条记录",
+                "sInfoFiltered": "数据列表中共  _MAX_ 条记录",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上一页",
+                    "sNext": "下一页",
+                    "sLast": "末页"
+                }
+            },
+            "fnServerData": function (sSource, aoData, fnCallback, oSettings) {
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "GET",
+                    "async": 'false',
+                    "url": sSource,
+                    "data": {
+                        'pageNum': (aoData[3].value / aoData[4].value) + 1,
+                        'pageSize': aoData[4].value,
+                        'id': $("#id").val(),
+                        'roleName': $("#roleName").val(),
+                        'status': $('#selectStatus').val()
+                    },
+                    "success": fnCallback
+                });
+            },
+            "fnDrawCallback": function () {
+                var api = this.api();
+                var startIndex = api.context[0]._iDisplayStart;//获取到本页开始的条数
+                api.column(0).nodes().each(function (cell, i) {
+                    cell.innerHTML = startIndex + i + 1;
+                });
+
+            }
+        });
+        //验证初始化
+        $('#addLogisticForm').validationEngine({
+            promptPosition: 'bottomLeft'
+            , autoPositionUpdate: false
+            , addPromptClass: 'formError-text'
+            , autoHidePrompt: true
+            , autoHideDelay: 3000
+            , fadeDuration: 0.3
+        });
+    });
+
+    function reset() {
+        $("#selectStatus").selectpicker('val', "");
+        $("#selectForm")[0].reset();
+
+    }
+
+
+    //查看
+    function editById(self){
+
+        var temp = $(self).prev(".temp_data").html()
+        var tempObj = JSON.parse(temp);
+        var id=tempObj.id;
+        var notify_url=tempObj.notify_url;
+        var public_key=tempObj.public_key;
+        var request_adress_df=tempObj.request_adress_df;
+        var query_address=tempObj.query_address;
+        $("#id").val(id);
+        $("#notifyUrl2").val(notify_url);
+        $("#publicKey2").val(public_key);
+        $("#requestAdressDf2").val(request_adress_df);
+        $("#queryAddress2").val(query_address);
+        $.ajax({
+            async:false,
+            url:"/configuration/WJDFConfig/findWjCash",
+            data:{WjCashId:id},
+            type:"POST",
+            dataType:"json",
+            success:function(data){
+                if (data.code==200) {
+                    layer.open({
+                        type: 1,
+                        title: '查看',
+                        closeBtn : 0,
+                        area: ['600px','500px'],
+                        btn:['确定'],
+                        btnAlign: 'c',
+                        content: $('#findLinkmanBox'),
+                        yes:function (index, layero) {
+                            layer.close(index);
+                        }, btn2: function(index, layero){
+                            layer.close(index);
+                        }
+                    });
+                } else {
+                    layer.alert(data.message, {icon: 2,btnAlign: 'c', closeBtn : 0});
+                }
+            }
+        });
+
+    }
+
+    //编辑维基代付配置
+    function enableById(self) {
+        var temp = $(self).prev(".temp_data").html()
+        var tempObj = JSON.parse(temp);
+        var id=tempObj.id;
+        var name=tempObj.name;
+        var method=tempObj.method;
+        var merchant_no=tempObj.merchant_no;
+        var card_type=tempObj.card_type;
+        var bank_account_type=tempObj.bank_account_type;
+        var order_subject=tempObj.order_subject;
+        var notify_url=tempObj.notify_url;
+        var public_key=tempObj.public_key;
+        var request_adress_df=tempObj.request_adress_df;
+        var query_address=tempObj.query_address;
+
+        $("#id").val(id);
+        $("#name").val(name);
+        $("#method").val(method);
+        $("#merchant_no").val(merchant_no);
+        $("#card_type").val(card_type);
+        $("#bank_account_type").val(bank_account_type);
+        $("#order_subject").val(order_subject);
+        $("#notify_url").val(notify_url);
+        $("#public_key").val(public_key);
+        $("#request_adress_df").val(request_adress_df);
+        $("#query_address").val(query_address);
+
+        layer.open({
+            type: 1,
+            title: '修改维基代付配置',
+            closeBtn: 0,
+            area: ['600px', '500px'],
+            btn: ['保存', '取消'],
+            btnAlign: 'c',
+            content: $('#addLinkmanBox'),
+            btn1: function (index) {
+                   var flag = $("#addLogisticForm").validationEngine("validate");
+                var bool = validateParam();
+                if (!flag) {
+                    return false;
+                }
+                $.ajax({
+                    type: "POST",
+                    url: '/configuration/WJDFConfig/updateOrSaveWjCash',
+                    data: $("#addLogisticForm").serialize(),
+                    success: function (json) {
+                        d=eval("("+json+")");
+                        if (d.code==200) {
+                            tb.draw(false);
+                            layer.alert("修改成功！", {
+                                icon: 1,
+                                title: '提示',
+                                closeBtn: 0,
+                                btnAlign: 'c'
+                            });
+                        } else {
+                            layer.alert(d.msg, {
+                                icon: 2,
+                                title: '失败',
+                                closeBtn: 0,
+                                btnAlign: 'c'
+                            });
+                        }
+                    }
+                });
+
+                $('#addLogisticForm')[0].reset()
+                layer.close(index);
+            },
+            btn2: function (index) {
+                //清空表单
+                $('#addLogisticForm')[0].reset()
+                layer.close(index);
+            }
+        });
+    }
+
+
+
+
+    //添加配置
+    $('.ph_snbBtn').on('click', '.Js_addLogistic', function() {
+        clearData();
+        layer.open({
+            type : 1,
+            title : '添加维基代付配置',
+            closeBtn : 0,
+            area : [ '600px', '500px' ],
+            btn : [ '确定', '取消' ],
+            yes : function(index, layero) {
+              var flag = $("#addLogisticForm").validationEngine("validate");
+                var bool = validateParam();
+                if (flag) {
+//                    var params = $("#addLogisticForm").serializeJson();
+                    var params = $("#addLogisticForm").serialize();
+                    $.ajax({
+                        url : '/configuration/WJDFConfig/updateOrSaveWjCash',
+                        type : 'post',
+                        data : params,
+                        dataType : 'json',
+                        success : function(json) {
+                            if (json.code==200) {
+                                tb.draw(false);
+                                layer.alert("添加成功！", {
+                                    icon: 1,
+                                    title: '提示',
+                                    closeBtn: 0,
+                                    btnAlign: 'c'
+                                });
+                            } else {
+                                layer.alert(json.msg, {
+                                    icon: 2,
+                                    title: '添加失败',
+                                    closeBtn: 0,
+                                    btnAlign: 'c'
+                                });
+                            }
+                        }
+                    })
+                    $('#addLogisticForm')[0].reset()
+                    layer.close(index);
+                }
+                btn2: function a (index) {
+                    //清空表单
+                    $('#addLogisticForm')[0].reset()
+                    layer.close(index);
+                }
+            },
+            btnAlign : 'c',
+            content : $('#addLinkmanBox')
+        });
+    });
+
+    function clearData() {
+        $("#addLogisticForm")[0].reset();
+    }
+
+    //验证
+    function validateParam() {
+        /*var account_type = $("#account_type").val();
+        if (!account_type || account_type.length>50) {
+            layer.alert('账户类型不能为空,或长度超过50个字符!');
+            return false;
+        }
+        var institutionid = $("#institutionid").val();
+        if (!institutionid || institutionid.length>50) {
+            layer.alert('机构id不能为空,或长度超过50个字符!');
+            return false;
+        }
+        var notificationurl = $("#notificationurl").val();
+        if (!notificationurl || notificationurl.length>50) {
+            layer.alert('支付成功地址不能为空,或长度超过50个字符!');
+            return false;
+        }
+        var method = $("#method").val();
+        if (!method || method.length>50) {
+            layer.alert('api不能为空,或长度超过50个字符!');
+            return false;
+        }
+        var name = $("#name").val();
+        if (!name || name.length>50) {
+            layer.alert('配置名称不能为空,或长度超过50个字符!');
+            return false;
+        }
+        var page_url = $("#page_url").val();
+        if (!page_url || page_url.length>50) {
+            layer.alert('同步地址不能为空,或长度超过50个字符!');
+            return false;
+        }
+        var private_pfx_mima = $("#private_pfx_mima").val();
+        if (!private_pfx_mima || private_pfx_mima.length>50) {
+            layer.alert('私钥密码不能为空,或长度超过50个字符!');
+            return false;
+        }
+        var private_pfx_url = $("#private_pfx_url").val();
+        if (!private_pfx_url || private_pfx_url.length>50) {
+            layer.alert('私钥地址不能为空,或长度超过50个字符!');
+            return false;
+        }
+        var public_cer_url = $("#public_cer_url").val();
+        if (!public_cer_url || public_cer_url.length>50) {
+            layer.alert('公钥地址不能为空,或长度超过50个字符!');
+            return false;
+        }
+        var rsa_name = $("#rsa_name").val();
+        if (!rsa_name || rsa_name.length>50) {
+            layer.alert('rsa格式不能为空,或长度超过50个字符!');
+            return false;
+        }
+        var settlement_flag = $("#settlement_flag").val();
+        if (!settlement_flag || settlement_flag.length>50) {
+            layer.alert('结算方式不能为空,或长度超过50个字符!');
+            return false;
+        }
+        var w_getway_url_df = $("#w_getway_url_df").val();
+        if (!w_getway_url_df || w_getway_url_df.length>50) {
+            layer.alert('代付请求地址不能为空,或长度超过50个字符!');
+            return false;
+        }
+        var w_getway_url_zf = $("#w_getway_url_zf").val();
+        if (!w_getway_url_zf || w_getway_url_zf.length>50) {
+            layer.alert('支付请求地址不能为空,或长度超过50个字符!');
+            return false;
+        }
+        var payment_account_name = $("#payment_account_name").val();
+        if (!payment_account_name || payment_account_name.length>50) {
+            layer.alert('支付机构名称地址不能为空,或长度超过50个字符!');
+            return false;
+        }
+        var payment_account_number = $("#payment_account_number").val();
+        if (!payment_account_number || payment_account_number.length>50) {
+            layer.alert('支付机构号码不能为空,或长度超过50个字符!');
+            return false;
+        }*/
+
+
+        return true;
+    }
+
+    /*跳转到编辑页面*/
+    function editRole(roleId) {
+        window.location.href="/web/special/updateTopic/"+roleId;
+    }
+    /*跳转到浏览页面*/
+    function editLook(roleId) {
+        window.location.href="/web/special/toLookTopic/"+roleId;
+    }
+
+    function add(){
+        localStorage.removeItem("formData")
+        window.location.href="/pc/view/ffConfig/toAdd";
+    }
+    $('.ph_snbBtn').on('click', '.Js_deliver', function () {
+        layer.open({
+            type: 1,
+            title: '添加用户',
+            closeBtn: 0,
+            area: ['442px', '230px'],
+            btn: ['保存', '取消'],
+            btnAlign: 'c',
+            content: $('#deliverBox'),
+            btn1: function (index) {
+
+                var flag = $("#addUserForm").validationEngine("validate");
+                if (!flag) {
+                    return false;
+                }
+                $.ajax({
+//              async       : false,
+                    type: "POST",
+                    url: "/permission/user/add",
+                    data: $("#addUserForm").serialize(),
+                    success: function (d) {
+                        d=eval("("+d+")");
+                        if (d.code=="200") {
+                            layer.alert("保存成功！", {
+                                icon: 1,
+                                title: '提示',
+                                closeBtn: 0,
+                                btnAlign: 'c'
+                            });
+                            tb.draw();
+                        } else {
+                            layer.alert(d.message, {
+                                icon: 2,
+                                title: '失败',
+                                closeBtn: 0,
+                                btnAlign: 'c'
+                            });
+                        }
+                    }
+                });
+                $('#addUserForm')[0].reset()
+                layer.close(index);
+
+            }
+        });
+    });
+    // 原生写法
+    // js 实现匹配空格删除
+    var mer_url = document.getElementsByTagName('input');
+    for (var i = 0; i < mer_url.length; i++) {
+        mer_url[i].onblur = function() {
+         //   console.log();
+            this.value = Trim(this.value);
+        };
+    }
+
+    // 监测空格函数 如果有空格替换成空
+    function Trim(str) {
+        return str.replace(/\s*/g,"");
+    }
+
+    //鼠标悬浮，清空title所有数据
+    $("#example").on("mouseenter",".ph_tableShow",function(){
+        $(this).attr("title","")
+    })
+</script>
+</body>
+</html>

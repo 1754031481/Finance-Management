@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.chconfig.ChCashConfigMapper">
+
+
+    <sql id="baseSelect">
+		SELECT
+		  id,
+         create_user,
+         created_ip,
+         created_time,
+         update_time,
+         appid,
+         backurl,
+         bankaccounttype,
+         bankcardtype,
+         dog_sk,
+         fromaccountnumber,
+         name,
+         root_url,
+         service_id,
+         subject,
+         terminal
+	</sql>
+
+
+    <select id="findChCashConfig" resultType="map">
+        <include refid="baseSelect"/>  FROM ch_cash_config  ORDER BY created_time DESC
+    </select>
+
+    <select id="findCashConfig" resultType="Map" parameterType="com.zc.entity.chconfig.CHCashConfig">
+       SELECT * FROM ch_cash_config  WHERE  id = #{chid}
+    </select>
+    <update id="updateChCashConfig" parameterType="com.zc.entity.chconfig.CHCashConfig">
+       UPDATE ch_cash_config
+        <set>
+            <if test="appid != null">appid=#{appid},</if>
+            <if test="backurl != null">backurl=#{backurl},</if>
+            <if test="bankaccounttype != null">bankaccounttype=#{bankaccounttype},</if>
+            <if test="bankcardtype != null">bankcardtype=#{bankcardtype},</if>
+            <if test="dogSk!= null">dog_sk=#{dogSk},</if>
+            <if test="fromaccountnumber != null">fromaccountnumber=#{fromaccountnumber},</if>
+            <if test="name!= null">name=#{name},</if>
+            <if test="rootUrl != null">root_url=#{rootUrl},</if>
+            <if test="serviceId != null">service_id=#{serviceId},</if>
+            <if test="subject != null">subject=#{subject},</if>
+       <!--     <if test="terminal != null">terminal=#{terminal},</if>-->
+        </set>
+        WHERE   id = #{id}
+    </update>
+    
+    <insert id="addChCashConfig"  parameterType="com.zc.entity.chconfig.CHCashConfig">
+        INSERT INTO  ch_cash_config (created_time,update_time,appid,backurl,bankaccounttype,bankcardtype,dog_sk,fromaccountnumber,name,root_url,service_id,subject,terminal)
+            VALUES (#{createdTime},#{updateTime},#{appid},#{backurl},#{bankaccounttype},#{bankcardtype},#{dogSk},#{fromaccountnumber},#{name},#{rootUrl},#{serviceId},#{subject},#{terminal})
+    </insert>
+
+</mapper>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+
+<head>
+    <meta charset="UTF-8">
+    <title>导入推送订单</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common/models.css}">
+    <!--bootstrap-select  css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/bootstrapselect/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/bootstrapselect/css/bootstrap-select.css}"/>
+    <!--文件树插件 css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/ztree/zTreeStyle.css}">
+    <style>
+        #filename{
+            width: 67px !important;
+        }
+        #SWFUpload_0{
+            width: 67px !important;
+        }
+        #filename-button{
+            background-repeat: no-repeat;
+            width: 67px !important;
+        }
+    </style>
+
+</head>
+<body>
+
+
+
+<div class="MainContent">
+    <!--面包屑-->
+    <div class="current">当前位置：<a href="#">关于推送</a>&nbsp;&gt;&nbsp;<span>导入推送订单</span></div>
+    <!--end 面包屑-->
+    <!--主体内容-->
+    <div class="MainCont">
+        <!--标题-->
+
+        <div class="ph_subTit">
+            <h2>导入推送订单</h2>
+            <!--<shiro:hasPermission name="topicAdd">-->
+            <br>
+           <!-- <form role="form">
+
+                <div class="form-group">
+                    <label for="inputfile">文件输入</label>
+                    <input type="file" id="inputfile">
+                    <p class="help-block"></p>
+                </div>
+                <button type="submit" class="btn btn-default">提交</button>
+            </form>-->
+            <form id="form1">
+
+                <span class="qingxuanze"><font size="3" color="red">请选择你要上传的文件：</font></span>
+                <br><br>
+                <input name="file" type="file" id="attach" size="50" class="xuanze">
+                <a href="/web/push/download">下载模板</a><br>
+                <table class="ph_tableBox">
+                    <tr>
+                        <th style="text-align: left;width: 80px">动态口令：</th>
+                        <td ><input id="otp" class="validate[required, minSize[6],maxSize[16]]" type="text" style="width: 200px;height: 30px"  placeholder="请输入动态口令"></td>
+                    </tr>
+                </table><br>
+                <!--<span >动态口令：</span><input  type="text" name="aa" id="otp" style="width: 200px;height: 30px"
+                                   class="validate[required, min[6]]"><br><br>-->
+                <input type="button" value="提交" class="tijiao">&nbsp;&nbsp;
+                <span style="display: none" id="msg"><font size="3" color="red">未选择文件！</font></span>
+
+            </form>
+            <!--</shiro:hasPermission>-->
+        </div>
+
+        <!--end 标题-->
+        <!--专题列表-->
+        <div class="ph_wareBox">
+            <table class="ph_wareList" id="example"></table>
+        </div>
+        <!--end 专题列表-->
+    </div>
+    <!--end 主体内容-->
+</div>
+
+
+
+
+<!--添加用户弹窗-->
+<div class="PopupBox" id="deliverBox">
+    <!--内容-->
+    <div class="PopupCon">
+        <div class="ph_subPoCon ph_screen">
+            <form id="addAlPayForm">
+                <table class="ph_tableBox">
+                </table>
+            </form>
+        </div>
+    </div>
+    <!--end 内容-->
+</div>
+<!--end 添加用户弹窗-->
+
+
+
+<!--查看用户弹窗-->
+<div class="PopupBox" id="find">
+    <!--内容-->
+    <div class="PopupCon">
+        <div class="ph_subPoCon ph_screen">
+            <form>
+                <table class="ph_tableBox">
+                </table>
+            </form>
+        </div>
+    </div>
+    <!--end 内容-->
+</div>
+<!--end 添加用户弹窗-->
+
+<!--遮罩层-->
+<div class="maskBox"></div>
+</div>
+
+<!--操作框 -->
+<div id="handle">
+</div>
+<!--end 操作框-->
+
+<script type="text/javascript" th:src="@{/js/common/jquery-1.11.1.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/common/index.js}"></script>
+<!--bootstrap-select-->
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/bootstrap-select.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/select.js}"></script>
+<!--分页-->
+<script type="text/javascript" th:src="@{/js/plugins/pages/jquery.dataTables.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/layer/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/spm/spmExtends.js}"></script>
+<!--bootstrap-select-->
+
+<!-- 验证 -->
+<script type="text/javascript" th:src="@{/js/plugins/validat/jquery.validationEngine.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/validat/jquery.validationEngine-zh_CN.js}"></script>
+
+
+<!--文件树插件-->
+<!--<script type="text/javascript" th:src="@{/static/js/plugins/ztree/jquery-1.4.4.min.js}"></script>-->
+<script type="text/javascript" th:src="@{/js/plugins/ztree/jquery.ztree.core.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/ztree/jquery.ztree.excheck.min.js}"></script>
+
+<!--上传图片-->
+<script type="text/javascript" th:inline="javascript">
+
+
+
+    $(document).on('click', '.tijiao', function () {
+        var file = new FormData();
+        var files = $("#attach")[0].files[0];
+        var otp = $("#otp").val();
+        var flag=$("#form1").validationEngine("validate");
+        if(!flag){
+            return;
+        }
+        if(!files){
+            $("#msg").show();
+            return;
+        }
+        $("#msg").hide();
+        file.append("file", files);
+        file.append("otp",otp);
+        $.ajax({
+//              async       : false,
+            type: "POST",
+            url: "/web/push/upload",
+            enctype: 'multipart/form-data',
+            data: file,
+            dataType: "json",
+            contentType: false,
+            processData: false,
+            success: function (d) {
+                if (d.code == "200") {
+                    layer.alert(d.message, {
+                        icon: 1,
+                        title: '提示',
+                        closeBtn: 0,
+                        btnAlign: 'c'
+                    });
+                    tb.draw(false);
+                } else {
+                    layer.alert(d.message, {
+                        icon: 2,
+                        title: '失败',
+                        closeBtn: 0,
+                        btnAlign: 'c'
+                    });
+                }
+            }
+
+        });
+        layer.close(index);
+
+    })
+
+    $(function () {
+        //验证初始化
+        $('#form1').validationEngine({
+            promptPosition: 'bottomLeft'
+            , autoPositionUpdate: false
+            , addPromptClass: 'formError-text'
+            , autoHidePrompt: true
+            , autoHideDelay: 3000
+            , fadeDuration: 0.3
+        });
+    });
+</script>
+</body>
+</html>

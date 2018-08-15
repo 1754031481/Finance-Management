@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+>
+
+<head>
+    <meta charset="UTF-8">
+    <title>激活接口配置列表</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common/models.css}">
+    <!--bootstrap-select  css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/bootstrapselect/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/bootstrapselect/css/bootstrap-select.css}"/>
+    <!--文件树插件 css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/ztree/zTreeStyle.css}">
+    <style>
+        #filename {
+            width: 67px !important;
+        }
+
+        #SWFUpload_0 {
+            width: 67px !important;
+        }
+
+        #filename-button {
+            background-repeat: no-repeat;
+            width: 67px !important;
+        }
+        #chose{
+            font-size: 14px;
+            color: #555555;
+            vertical-align: middle;
+            height: 44px;
+            line-height: 22px;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+
+</head>
+<body>
+<div class="MainContent">
+    <!--面包屑-->
+    <div class="current">当前位置：<a href="#">接口支持</a>&nbsp;&gt;&nbsp;<span>激活接口</span></div>
+    <!--end 面包屑-->
+    <!--主体内容-->
+    <div class="MainCont">
+        <!--标题-->
+
+        <div class="ph_subTit">
+            <h2>接口列表</h2>
+            <!--<shiro:hasPermission name="topicAdd">-->
+            <div class="ph_snbBtn">
+                <input class="Js_addLogistic" name="" type="button" value="添加">
+            </div>
+            <!--</shiro:hasPermission>-->
+
+        </div>
+
+        <br>
+        <div id="chose">
+            <span >接口类型: </span>&nbsp&nbsp
+            <span><input type="radio" name="tt" value="-1" onclick="toPage()" checked="checked">全部接口  </span>&nbsp&nbsp
+            <span><input type="radio" name="tt" value="1" onclick="toPage()">代付接口  </span>&nbsp&nbsp
+            <span><input type="radio" name="tt" value="0" onclick="toPage()">支付接口  </span>
+        </div>
+
+        <!--end 标题-->
+        <!--激活接口配置列表-->
+        <div class="ph_wareBox">
+            <table class="ph_wareList" id="example"></table>
+        </div>
+        <!--end 激活接口配置列表-->
+    </div>
+    <!--end 主体内容-->
+</div>
+
+
+<!--添加配置弹窗-->
+<div class="PopupBox" id="addLinkmanBox">
+    <!--关闭按钮-->
+    <a href="javascript: void(0);" class="close"></a>
+    <!--end 关闭按钮-->
+    <!--内容-->
+    <div class="PopupCon">
+        <div class="ph_subPoCon ph_screen">
+            <form class="form-inline" id="addLogisticForm">
+                <table class="ph_tableBox">
+                    <input id="id" name="id" hidden="hidden"/>
+                    <tr>
+                        <th><span class="require">*</span>通用配置：</th>
+                        <td><select id="commPayNameList" name="commonPayConfigId"
+                                    class="validate[required,min[1],maxSize[50]"></select></td>   <!--  comm id  -->
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>渠道配置：</th>
+                        <td><input type="text" id="thirdPayTypeNameList" name="thirdPayTypeName"
+                                    class="validate[required,min[1],maxSize[50]" ></td>   <!--third name-->
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>项目名称：</th>  <!--  sysfromid -->
+                        <td><select id="sysNameList" name="systemFromId"
+                                    class="validate[required,min[1],maxSize[50]"></select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>第三方渠道：</th>   <!-- interface id -->
+                        <td><select id="interFaceNameList" name="interFaceId"
+                                    class="validate[required,min[1],maxSize[50]"></select></td>
+                    </tr>
+                     <tr>
+                          <th><span class="require">*</span>配置Id：</th>
+                          <td><select id="payConfigIdList" name="payConfigId"
+                                      class="validate[required,min[1],maxSize[50]"></select></td>
+                      </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <!--end 内容-->
+</div>
+
+
+
+
+<!--遮罩层-->
+<div class="maskBox"></div>
+</div>
+
+<!--操作框 -->
+<div id="handle">
+</div>
+<!--end 操作框-->
+
+<script type="text/javascript" th:src="@{/js/common/jquery-1.11.1.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/common/index.js}"></script>
+<!--bootstrap-select-->
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/bootstrap-select.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/select.js}"></script>
+<!--分页-->
+<script type="text/javascript" th:src="@{/js/plugins/pages/jquery.dataTables.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/layer/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/spm/spmExtends.js}"></script>
+<!--bootstrap-select-->
+
+<!-- 验证 -->
+<script type="text/javascript" th:src="@{/js/plugins/validat/jquery.validationEngine.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/validat/jquery.validationEngine-zh_CN.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/common/util.js}"></script>
+
+<!--文件树插件-->
+<!--<script type="text/javascript" th:src="@{/static/js/plugins/ztree/jquery-1.4.4.min.js}"></script>-->
+<script type="text/javascript" th:src="@{/js/plugins/ztree/jquery.ztree.core.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/ztree/jquery.ztree.excheck.min.js}"></script>
+<script type="text/javascript" th:src="@{/uploadfy/jquery.uploadify.js}"></script>
+<!--上传图片-->
+<script type="text/javascript" th:inline="javascript">
+    var tb;
+    /*var sessionUser = [[${session.login_back_session}]];*/
+
+    $(function () {
+        /*  var Popupe = new PopupBase();
+         Popupe.show('.ph_wareBox', '.Js_btn', '.maskBox,.DeterBox');
+         Popupe.showHide('.subQuemit', '.refundBox,.deliverBox,.menuTreeBox', '.SucBox');
+         Popupe.show('.ph_snbBtn,.ph_wareBox', '.Js_deliver', '.maskBox,.deliverBox');
+         Popupe.show('.ph_wareBox', '.Js_menuTree', '.maskBox,.menuTreeBox');
+         Popupe.hide('.close', '.maskBox,.DeterBox,.SucBox,.deliverBox,.menuTreeBox');*/
+        tb = $('#example').DataTable({
+            "lengthChange": false,
+            "ordering": false,
+            "searching": false,
+            "bServerSide": true,
+            "autoWidth": false,
+            "sPaginationType": "full_numbers",
+            "bJQueryUI": true,
+            "sDom": '<"">t<"F"ip>',
+            "sAjaxSource": "/pc/view/interfacesupport/thirdPayTypeList", //ajax调用接口
+            "aoColumnDefs": [{sDefaultContent: '', aTargets: ['_all']}],
+            "aoColumns": [
+                {"sWidth": "50px", "sTitle": "序号", "mData": "id", "title": "id"},
+                {"sTitle": "通用配置", "mData": "commName", "class": "sClass"},
+                {"sTitle": "渠道配置", "mData": "third_pay_type_name", "class": "sClass"},
+                {"sTitle": "系统来源", "mData": "sysName", "class": "sClass"},
+                {"sTitle": "配置名称", "mData": "interFaceName", "class": "sClass"},
+                {
+                    "sWidth": "156px",
+                    "sTitle": "操作",
+                    "mData": "id",
+                    "sClass": "ph_tableShow",
+                    "mRender": function (data, type, full) {
+                        var text = '<div class="ph_operateBox"><input class="ph_operate" name="" type="button" value="操作选项">';
+                        text = text + '<ul class="ph_operateList hide" role="menu">';
+                        text += '<li ><div class="temp_data" style="display:none">'+ JSON.stringify(full) +'</div><a href="#" onclick="enableById(this);">激活</a> </li>';
+                        text = text + '</ul></div>';
+                        return text;
+                    }
+                }
+            ],
+            "oLanguage": {
+                "sProcessing": "数据加载中······",
+                "sLengthMenu": "显示 _MENU_ 条记录",
+                "sZeroRecords": "没有您要搜索的内容！",
+                "sEmptyTable": "列表中无数据存在！",
+                "sInfo": "当前显示 _START_ 到 _END_ 条数据，共 _TOTAL_ 条数据",
+                "sInfoEmpty": "显示 0 到 0 条记录",
+                "sInfoFiltered": "数据列表中共  _MAX_ 条记录",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上一页",
+                    "sNext": "下一页",
+                    "sLast": "末页"
+                }
+            },
+            "fnServerData": function (sSource, aoData, fnCallback, oSettings) {
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "GET",
+                    "async": 'false',
+                    "url": sSource,
+                    "data": {
+                        'pageNum': (aoData[3].value / aoData[4].value) + 1,
+                        'pageSize': aoData[4].value,
+                        'id': $("#id").val(),
+                        'type':$("input[name=tt]:checked").val()
+                    },
+                    "success": fnCallback
+                });
+            },
+            "fnDrawCallback": function () {
+                var api = this.api();
+                var startIndex = api.context[0]._iDisplayStart;//获取到本页开始的条数
+                api.column(0).nodes().each(function (cell, i) {
+                    cell.innerHTML = startIndex + i + 1;
+                });
+
+            }
+        });
+        //验证初始化
+        $('#addLogisticForm').validationEngine({
+            promptPosition: 'bottomLeft'
+            , autoPositionUpdate: false
+            , addPromptClass: 'formError-text'
+            , autoHidePrompt: true
+            , autoHideDelay: 3000
+            , fadeDuration: 0.3
+        });
+    });
+
+    function reset() {
+        $("#selectStatus").selectpicker('val', "");
+        $("#selectForm")[0].reset();
+
+    }
+
+    //编辑接口
+    function enableById(data) {
+        var temp = $(data).prev(".temp_data").html()
+        var tempObj = JSON.parse(temp);
+        var id = tempObj.tid;
+        var commName = tempObj.commName;
+        var thirdPayTypeName = tempObj.third_pay_type_name;
+        var sysName = tempObj.sysName;
+        var interFaceName = tempObj.interFaceName;
+        var payId=tempObj.pay_config_id;
+
+
+       $("#id").val(id);
+        $.ajax({
+            type: 'POST',
+            url: '/pc/view/interfacesupport/findSelectList',
+            success: function (json) {
+                var data = $.parseJSON(json)
+                if (data.code == 200) {
+                    var commPayNameList = data.commonPayList.content
+                   // $("#thirdPayTypeNameList").val(thirdPayTypeName)
+                    var sysNameList = data.systemFormList.content
+                    var interFaceNameList = data.interFaceList.content
+        // var payConfigIdList = data.interFaceList.content
+                    var paystr = '<option value="">请选择</option>';
+                    $.each(commPayNameList, function (i, object) {
+                        if (object.name == commName) {
+                            paystr += '<option value="' + object.id + '" selected="selected">' + object.name + '</option>';
+                        } else {
+                            paystr += '<option value="' + object.id + '" >' + object.name + '</option>';
+                        }
+                    });
+                   /* var paystr2 = '<option value="">请选择</option>';
+                    $.each(thirdPayTypeNameList, function (i, object) {
+                        if (object.third_pay_type_name == thirdPayTypeName) {
+                            paystr2 += '<option value="' + object.third_pay_type_name  + '" selected="selected">' + object.third_pay_type_name  + '</option>';
+                        } else {
+                            paystr2 += '<option value="' + object.third_pay_type_name + '" >' + object.third_pay_type_name + '</option>';
+                        }
+                    });*/
+
+
+                    var paystr3 = '<option value="">请选择</option>';
+                    $.each(sysNameList, function (i, object) {
+                        if (object.name == sysName) {
+                            paystr3 += '<option value="' + object.Id  + '" selected="selected">' + object.name  + '</option>';
+                        } else {
+                            paystr3 += '<option value="' + object.Id + '" >' + object.name + '</option>';
+                        }
+                    });
+
+                    var paystr4 = '<option value="">请选择</option>';
+                    $.each(interFaceNameList, function (i, object) {
+                        if (object.name == interFaceName) {
+                            paystr4 += '<option value="' + object.id  + '" selected="selected">' + object.name  + '</option>';
+                        } else {
+                            paystr4 += '<option value="' + object.id + '" >' + object.name + '</option>';
+                        }
+                    });
+                    $("#commPayNameList").html(paystr);
+                    $("#thirdPayTypeNameList").val(thirdPayTypeName);
+                    $("#sysNameList").html(paystr3);
+                    $("#interFaceNameList").html(paystr4);
+                    $("#payConfigIdList").html("")
+//        var interFaceId = $("#interFaceNameList").val();
+                    var interFaceId = $("#interFaceNameList").find('option:selected').text();
+                    $.ajax({
+                        type: 'POST',
+                        url: '/pc/view/interfacesupport/findSelectList',
+                        data: {interFaceName:interFaceId},
+                        success: function (json) {
+                            var data = $.parseJSON(json);
+//                var id = data.content.id;
+//                var name = data.content.name;
+                            var list = data.content;
+//                var option = "<option value='" + id + "'>" + id + "</option>"
+                            var paystr ;
+                            $.each(list, function (i, object) {
+                                if(object.id==payId) {
+                                    paystr += "<option   value='" + object.id + "' selected='selected'>" + object.name + "</option>";
+                                }else{
+                                    paystr += "<option   value='" + object.id + "'>" + object.name + "</option>";
+                                }
+
+                            });
+
+                            $("#payConfigIdList").html(paystr)
+                        },
+                        error: function () {
+                        }
+                    });
+                //    $("#payConfigIdList").html(paystr5);
+                } else {
+                    layer.alert(data.message, {
+                        icon: 2,
+                        title: '获取下拉菜单失败',
+                        closeBtn: 0,
+                        btnAlign: 'c'
+                    });
+                    return false;
+                }
+            }
+        });
+        layer.open({
+            type: 1,
+            title: '编辑接口',
+            closeBtn: 0,
+            area: ['600px', '500px'],
+            btn: ['保存', '取消'],
+            btnAlign: 'c',
+            content: $('#addLinkmanBox'),
+            btn1: function (index) {
+                var flag = $("#addLogisticForm").validationEngine("validate");
+                if (!flag) {
+                    return false;
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "/pc/view/interfacesupport/updateOrSaveThirdPayType",
+                    data: $("#addLogisticForm").serialize(),
+                    success: function (json) {
+                        d = eval("(" + json + ")");
+//                        console.log(d);
+                        if (d.code == 1) {
+                            tb.draw(false);
+                            layer.alert("修改成功！", {
+                                icon: 1,
+                                title: '提示',
+
+                                closeBtn: 0,
+                                btnAlign: 'c'
+                            });
+                        } else {
+                            layer.alert('修改成功', {
+                                icon: 2,
+                                title: '失败',
+                                closeBtn: 0,
+                                btnAlign: 'c'
+                            });
+                        }
+                    }
+                });
+
+                $('#addLogisticForm')[0].reset()
+                layer.close(index);
+            },
+            btn2: function (index) {
+                //清空表单
+                $('#addLogisticForm')[0].reset()
+                layer.close(index);
+            }
+        });
+    }
+
+    //添加接口
+    $('.ph_snbBtn').on('click', '.Js_addLogistic', function () {
+        clearData();
+
+        $.ajax({
+            type: 'POST',
+            url: '/pc/view/interfacesupport/findSelectList',
+            success: function (json) {
+                var data = $.parseJSON(json)
+                if (data.code == 200) {
+                    var commPayNameList = data.commonPayList.content
+                //    var thirdPayTypeNameList = data.thirdPayTypeList.content
+                    var sysNameList = data.systemFormList.content
+                    var interFaceNameList = data.interFaceList.content
+//         var payConfigIdList = data.interFaceList.content
+                    var paystr = '<option value="">请选择</option>';
+                    $.each(commPayNameList, function (i, object) {
+                        paystr += "<option value='" + object.id + "'>" + object.name + "</option>";
+                    });
+                   /* var paystr2 = '<option value="">请选择</option>';
+                    $.each(thirdPayTypeNameList, function (i, object) {
+                        paystr2 += "<option value='" + object.third_pay_type_name + "'>" + object.third_pay_type_name + "</option>";
+                    });*/
+
+                    var paystr3 = '<option value="">请选择</option>';
+                    $.each(sysNameList, function (i, object) {
+                        paystr3 += "<option value='" + object.Id + "'>" + object.name + "</option>";
+                    });
+
+                    var paystr4 = '<option value="">请选择</option>';
+                    $.each(interFaceNameList, function (i, object) {
+                        paystr4 += "<option   value='" + object.id + "'>" + object.name + "</option>";
+                    });
+                    $("#commPayNameList").html(paystr);
+                  //  $("#thirdPayTypeNameList").html(paystr2);
+                    $("#sysNameList").html(paystr3);
+                    $("#interFaceNameList").html(paystr4);
+                } else {
+                    layer.alert(data.message, {
+                        icon: 2,
+                        title: '获取下拉菜单失败',
+                        closeBtn: 0,
+                        btnAlign: 'c'
+                    });
+                    return false;
+                }
+            }
+        });
+
+        layer.open({
+            type: 1,
+            title: '激活接口',
+            closeBtn: 0,
+            area: ['600px', '400px'],
+            btn: ['确定', '取消'],
+            yes: function (index, layero) {
+                var flag = $("#addLogisticForm").validationEngine("validate");
+                if (!flag) {
+                    return false;
+                }
+                var params = $("#addLogisticForm").serialize();
+                $.ajax({
+                    url: '/pc/view/interfacesupport/updateOrSaveThirdPayType',
+                    type: 'post',
+                    data: params,
+                    dataType: 'json',
+                    success: function (json) {
+                        if (json.code == 1) {
+                            tb.draw(false);
+                            layer.alert("添加成功！", {
+                                icon: 1,
+                                title: '提示',
+                                closeBtn: 0,
+                                btnAlign: 'c'
+                            });
+                        } else {
+                            layer.alert('添加失败', {
+                                icon: 2,
+                                title: '添加失败',
+                                closeBtn: 0,
+                                btnAlign: 'c'
+                            });
+                        }
+                    }
+                })
+                $('#addLogisticForm')[0].reset()
+                layer.close(index);
+                btn2: function a(index) {
+                    //清空表单
+                    $('#addLogisticForm')[0].reset()
+                    layer.close(index);
+                }
+            },
+            btnAlign: 'c',
+            content: $('#addLinkmanBox')
+        });
+    });
+
+    /* 选择第三方渠道 */
+    $("#interFaceNameList").change(function () {
+        $("#payConfigIdList").html("")
+        var val = $(this).val();
+//        var interFaceId = $("#interFaceNameList").val();
+        var interFaceId = $("#interFaceNameList").find('option:selected').text();
+        $.ajax({
+            type: 'POST',
+            url: '/pc/view/interfacesupport/findSelectList',
+            data: {interFaceName:interFaceId},
+            success: function (json) {
+                var data = $.parseJSON(json);
+//                var id = data.content.id;
+//                var name = data.content.name;
+                var list = data.content;
+//                var option = "<option value='" + id + "'>" + id + "</option>"
+                var paystr ;
+                $.each(list, function (i, object) {
+                    paystr += "<option   value='" + object.id + "'>" + object.name + "</option>";
+                });
+
+                $("#payConfigIdList").html(paystr)
+            },
+            error: function () {
+            }
+        });
+    })
+
+    function clearData() {
+        $("#addLogisticForm")[0].reset();
+        $("#payConfigIdList").val("")
+    }
+
+    //鼠标悬浮，清空title所有数据
+    $("#example").on("mouseenter",".ph_tableShow",function(){
+        $(this).attr("title","")
+
+    })
+
+    function toPage() {
+        tb.draw();
+    }
+</script>
+</body>
+</html>

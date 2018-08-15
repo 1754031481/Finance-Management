@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+
+<head>
+    <meta charset="UTF-8">
+    <title>代付订单复审列表</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common/models.css}">
+    <!--bootstrap-select  css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/bootstrapselect/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/bootstrapselect/css/bootstrap-select.css}"/>
+    <!--文件树插件 css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/ztree/zTreeStyle.css}">
+    <!--日期  css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/datepicker/css/bootstrap-datepicker.css}">
+    <style>
+        #filename {
+            width: 67px !important;
+        }
+
+        #SWFUpload_0 {
+            width: 67px !important;
+        }
+
+        #filename-button {
+            background-repeat: no-repeat;
+            width: 67px !important;
+        }
+    </style>
+
+</head>
+<body>
+<input type="hidden" id="orderIds">
+<div class="MainContent">
+    <!--面包屑-->
+    <div class="current">当前位置：<a href="#">特殊订单处理</a>&nbsp;&gt;&nbsp;<span>代付订单复审列表</span></div>
+    <!--end 面包屑-->
+    <!--主体内容-->
+    <div class="MainCont">
+        <!--标题-->
+
+        <div class="ph_subTit">
+            <h2>代付订单复审列表</h2>
+            <!--<shiro:hasPermission name="topicAdd">-->
+            <!--</shiro:hasPermission>-->
+        </div>
+
+
+        <form id="queryForm">
+            <div class="ph_screen">
+                <table class="ph_tableBox">
+                    <tr>
+                        <th>业务来源：</th>
+                        <td><select   id="querySystemFrom" name="querySystemFrom"></select></td>
+                        </select></td>
+                        <th>三方渠道：</th>
+                        <td><select id="queryThiredPayType" name="queryThiredPayType">
+                            <option value="">请选择</option>
+                        </select></td>
+                        <!--<th>发起来源：</th>
+                        <td><input type="text" id="queryThiredPayType" name="queryThiredPayType"></td>-->
+                        <th>订单号：</th>
+                        <td><input type="text" id="queryOrderNum" name="queryOrderNum" style="width: 300px;height:40px "></td>
+                    </tr>
+                    <tr>
+                        <th>订单时间：</th>
+                        <td>
+                            <p class="dayBox">
+                                <input class="start_rise date startDate" name="" type="text" id="createTimeStr"
+                                       style="width: 98px">&nbsp;-&nbsp;
+                                <input class="start_rise date endDate" name="" type="text" id="createTimeEnd"
+                                       style="width: 98px">
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+                <center>
+                    <input name="" type="button" onclick="query();" value="查询">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <input name="" type="button" onclick="reset();" value="重置">
+                </center>
+            </div>
+
+        </form>
+
+
+        <!--end 标题-->
+        <!--查询订单列表-->
+        <div class="ph_wareBox">
+            <table class="ph_wareList" id="example"></table>
+        </div>
+        <!--end 查询订单列表-->
+        <div>
+            <input name="" type="button" onclick="batchinsert();" value="批量复审">
+            <input name="" type="button" onclick="downloadPay();" value="导出数据">
+        </div>
+    </div>
+    <!--end 主体内容-->
+
+
+</div>
+
+
+<!-- 查看弹窗-->
+<div class="PopupBox" id="findLinkmanBox">
+    <!--关闭按钮-->
+    <a href="javascript: void(0);" class="close"></a>
+    <!--end 关闭按钮-->
+    <!--内容-->
+    <div class="PopupCon">
+        <div class="ph_subPoCon ph_screen">
+            <form class="form-inline" id="addFindLogisticForm">
+                <table class="ph_tableBox">
+                    <input id="id" name="id" hidden="hidden"/>
+                </table>
+            </form>
+        </div>
+
+    </div>
+    <!--end 内容-->
+</div>
+<!--end查看弹窗-->
+
+
+<!--遮罩层-->
+<div class="maskBox"></div>
+</div>
+
+<!--操作框 -->
+<div id="handle">
+</div>
+<!--end 操作框-->
+
+<script type="text/javascript" th:src="@{/js/common/jquery-1.11.1.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/common/index.js}"></script>
+<!--bootstrap-select-->
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/bootstrap-select.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/select.js}"></script>
+<!--分页-->
+<script type="text/javascript" th:src="@{/js/plugins/pages/jquery.dataTables.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/layer/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/spm/spmExtends.js}"></script>
+<!--bootstrap-select-->
+
+<!--日期控件-->
+<script type="text/javascript" th:src="@{/js/plugins/datepicker/bootstrap-datepicker.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/datepicker/jquery.timepicker.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/datepicker/jquery.datepair.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/datepicker/datepicker.js}"></script>
+
+<!-- 验证 -->
+<script type="text/javascript" th:src="@{/js/plugins/validat/jquery.validationEngine.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/validat/jquery.validationEngine-zh_CN.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/common/util.js}"></script>
+
+<!--文件树插件-->
+<!--<script type="text/javascript" th:src="@{/static/js/plugins/ztree/jquery-1.4.4.min.js}"></script>-->
+<script type="text/javascript" th:src="@{/js/plugins/ztree/jquery.ztree.core.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/ztree/jquery.ztree.excheck.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/datepicker/bootstrap-datepicker.js}"></script>
+<!--上传图片-->
+<script type="text/javascript" th:inline="javascript">
+    /* 文本编译，过滤js代码，html标签 */
+    var HtmlEncode = function (str) {
+        var hex = new Array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f');
+        var preescape = str;
+        var escaped = "";
+        for (var i = 0; i < preescape.length; i++) {
+            var p = preescape.charAt(i);
+            escaped = escaped + escapeCharx(p);
+        }
+
+        return escaped;
+
+        function escapeCharx(original) {
+            var found = true;
+            var thechar = original.charCodeAt(0);
+            switch (thechar) {
+                case 10:
+                    return "<br/>";
+                    break; //newline
+                case 32:
+                    return "&nbsp;";
+                    break; //space
+                case 34:
+                    return "&quot;";
+                    break; //"
+                case 38:
+                    return "&amp;";
+                    break; //&
+                case 39:
+                    return "&#x27;";
+                    break; //'
+                case 47:
+                    return "&#x2F;";
+                    break; // /
+                case 60:
+                    return "&lt;";
+                    break; //<
+                case 62:
+                    return "&gt;";
+                    break; //>
+                case 198:
+                    return "&AElig;";
+                    break;
+                case 193:
+                    return "&Aacute;";
+                    break;
+                case 194:
+                    return "&Acirc;";
+                    break;
+                case 192:
+                    return "&Agrave;";
+                    break;
+                case 197:
+                    return "&Aring;";
+                    break;
+                case 195:
+                    return "&Atilde;";
+                    break;
+                case 196:
+                    return "&Auml;";
+                    break;
+                case 199:
+                    return "&Ccedil;";
+                    break;
+                case 208:
+                    return "&ETH;";
+                    break;
+                case 201:
+                    return "&Eacute;";
+                    break;
+                case 202:
+                    return "&Ecirc;";
+                    break;
+                case 200:
+                    return "&Egrave;";
+                    break;
+                case 203:
+                    return "&Euml;";
+                    break;
+                case 205:
+                    return "&Iacute;";
+                    break;
+                case 206:
+                    return "&Icirc;";
+                    break;
+                case 204:
+                    return "&Igrave;";
+                    break;
+                case 207:
+                    return "&Iuml;";
+                    break;
+                case 209:
+                    return "&Ntilde;";
+                    break;
+                case 211:
+                    return "&Oacute;";
+                    break;
+                case 212:
+                    return "&Ocirc;";
+                    break;
+                case 210:
+                    return "&Ograve;";
+                    break;
+                case 216:
+                    return "&Oslash;";
+                    break;
+                case 213:
+                    return "&Otilde;";
+                    break;
+                case 214:
+                    return "&Ouml;";
+                    break;
+                case 222:
+                    return "&THORN;";
+                    break;
+                case 218:
+                    return "&Uacute;";
+                    break;
+                case 219:
+                    return "&Ucirc;";
+                    break;
+                case 217:
+                    return "&Ugrave;";
+                    break;
+                case 220:
+                    return "&Uuml;";
+                    break;
+                case 221:
+                    return "&Yacute;";
+                    break;
+                case 225:
+                    return "&aacute;";
+                    break;
+                case 226:
+                    return "&acirc;";
+                    break;
+                case 230:
+                    return "&aelig;";
+                    break;
+                case 224:
+                    return "&agrave;";
+                    break;
+                case 229:
+                    return "&aring;";
+                    break;
+                case 227:
+                    return "&atilde;";
+                    break;
+                case 228:
+                    return "&auml;";
+                    break;
+                case 231:
+                    return "&ccedil;";
+                    break;
+                case 233:
+                    return "&eacute;";
+                    break;
+                case 234:
+                    return "&ecirc;";
+                    break;
+                case 232:
+                    return "&egrave;";
+                    break;
+                case 240:
+                    return "&eth;";
+                    break;
+                case 235:
+                    return "&euml;";
+                    break;
+                case 237:
+                    return "&iacute;";
+                    break;
+                case 238:
+                    return "&icirc;";
+                    break;
+                case 236:
+                    return "&igrave;";
+                    break;
+                case 239:
+                    return "&iuml;";
+                    break;
+                case 241:
+                    return "&ntilde;";
+                    break;
+                case 243:
+                    return "&oacute;";
+                    break;
+                case 244:
+                    return "&ocirc;";
+                    break;
+                case 242:
+                    return "&ograve;";
+                    break;
+                case 248:
+                    return "&oslash;";
+                    break;
+                case 245:
+                    return "&otilde;";
+                    break;
+                case 246:
+                    return "&ouml;";
+                    break;
+                case 223:
+                    return "&szlig;";
+                    break;
+                case 254:
+                    return "&thorn;";
+                    break;
+                case 250:
+                    return "&uacute;";
+                    break;
+                case 251:
+                    return "&ucirc;";
+                    break;
+                case 249:
+                    return "&ugrave;";
+                    break;
+                case 252:
+                    return "&uuml;";
+                    break;
+                case 253:
+                    return "&yacute;";
+                    break;
+                case 255:
+                    return "&yuml;";
+                    break;
+                case 162:
+                    return "&cent;";
+                    break;
+                case '\r':
+                    break;
+                default:
+                    found = false;
+                    break;
+            }
+            if (!found) {
+                if (thechar > 127) {
+                    var c = thechar;
+                    var a4 = c % 16;
+                    c = Math.floor(c / 16);
+                    var a3 = c % 16;
+                    c = Math.floor(c / 16);
+                    var a2 = c % 16;
+                    c = Math.floor(c / 16);
+                    var a1 = c % 16;
+                    return "&#x" + hex[a1] + hex[a2] + hex[a3] + hex[a4] + ";";
+                } else {
+                    return original;
+                }
+            }
+        }
+    }
+    var tb;
+    $(function () {
+        tb = $('#example').DataTable({
+            "lengthChange": false,
+            "ordering": false,
+            "searching": false,
+            "bServerSide": true,
+            "autoWidth": false,
+            "sPaginationType": "full_numbers",
+            "bJQueryUI": true,
+            "sDom": '<"">t<"F"ip>',
+            "sAjaxSource": "/pc/view/recheckorder/list", //ajax调用接口===============================调用接口=====================================
+            "aoColumnDefs": [{sDefaultContent: '', aTargets: ['_all']}],
+            "aoColumns": [
+                {
+                    "sTitle": "<input type='checkbox' id='checkedAll'>",
+                    "sClass": "center",
+                    "bSortable": false,
+                    "sWidth": "40",
+                    "mRender": function (settings, rowIdx, rec, type) {
+                        return '<input type="checkbox"  class="checkchild"  name="checkBox1" value="' + rec.id + '"/>';
+                    }
+                },
+                {"sWidth": "50px", "sTitle": "序号", "mData": "id", "title": "id"},
+                {"sWidth": "300px","sTitle": "订单号", "mData": "order_num", "class": "sClass"},
+                {"sTitle": "订单创建时间", "mData": "created_time", "class": "sClass"},
+                {"sTitle": "发起来源", "mData": "third_pay_type", "class": "sClass"},
+                {"sTitle": "交易金额", "mData": "order_money", "class": "sClass"},
+                {
+                    "sTitle": "订单状态", "mData": "pay_status", "class": "sClass", "mRender": function (data, type, full) {
+                    var text;
+                    if (full.pay_status == "1") {
+                        text = "处理中";
+                    } else if (full.pay_status == "3") {
+                        text = "失败";
+                    }
+                    return text;
+                }
+                },
+                {
+                    "sWidth": "110px",
+                    "sTitle": "操作",
+                    "mData": "id",
+                    "sClass": "ph_tableShow",
+                    "mRender": function (data, type, full) {
+                        var obj2str = JSON.stringify(full)
+                        var text = '<li><div class="temp_data" style="display:none">'+ JSON.stringify(full) +'</div><a href="javascript:void(0);" onclick="oneinsert(this)">复审</a></li>';
+                        return text;
+                    }
+                }
+            ],
+            "oLanguage": {
+                "sProcessing": "数据加载中······",
+                "sLengthMenu": "显示 _MENU_ 条记录",
+                "sZeroRecords": "没有您要搜索的内容！",
+                "sEmptyTable": "列表中无数据存在！",
+                "sInfo": "当前显示 _START_ 到 _END_ 条数据，共 _TOTAL_ 条数据",
+                "sInfoEmpty": "显示 0 到 0 条记录",
+                "sInfoFiltered": "数据列表中共  _MAX_ 条记录",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上一页",
+                    "sNext": "下一页",
+                    "sLast": "末页"
+                }
+            },
+            "fnServerData": function (sSource, aoData, fnCallback, oSettings) {
+                var str= JSON.parse(sessionStorage.getItem("ida"));
+                if(str==null){
+                    str=new Array();
+                }
+                $('input[name="checkBox1"]').each(function () {
+                    if($.inArray($(this).val(),str)!=-1) {
+                        str.splice($.inArray($(this).val(), str), 1);
+                    }
+                });
+                $('input[name="checkBox1"]:checked').each(function () {
+                    str.push($(this).val())
+                });
+                sessionStorage.setItem("ida",JSON.stringify(str));
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "GET",
+                    "async": 'false',
+                    "url": sSource,
+                    "data": {
+                        'pageNum': (aoData[3].value / aoData[4].value) + 1,
+                        'pageSize': aoData[4].value,
+                        'createdTime': $('#createTimeStr').val(),
+                        'updateTime': $('#createTimeEnd').val(),
+                        'orderNum': $('#queryOrderNum').val(),
+                        'SystemFromName': $('#querySystemFrom').val(),
+                        'thirdPayType': $('#queryThiredPayType').val(),
+                    },
+                    "success": function(resp) {
+                        $("#orderIds").val(resp.ida);
+                        fnCallback(resp);
+                    }
+                });
+                setTimeout(function () {
+                    $("#checkedAll").removeProp("checked");
+                    var str = JSON.parse(sessionStorage.getItem("ida"));
+                    $('input[name="checkBox1"]').each(function () {
+                        if($.inArray($(this).val(),str)!=-1) {
+                            $(this).prop("checked","checked");
+                        }
+                    });
+                },100)
+            },
+            "fnDrawCallback": function () {
+                var api = this.api();
+                var startIndex = api.context[0]._iDisplayStart;//获取到本页开始的条数
+                api.column(1).nodes().each(function (cell, i) {
+                    cell.innerHTML = startIndex + i + 1;
+                });
+
+            }
+        });
+        //验证初始化
+        $('#addLogisticForm').validationEngine({
+            promptPosition: 'bottomLeft'
+            , autoPositionUpdate: false
+            , addPromptClass: 'formError-text'
+            , autoHidePrompt: true
+            , autoHideDelay: 3000
+            , fadeDuration: 0.3
+        });
+    });
+    //下拉框（业务来源）
+    $(function () {
+        $.post(
+            "/web/alPay/getSelect",
+            {},
+            function (data) {
+                var data = data.data;
+                var content = '<option value="" >全部</option>';
+                for (var i in data) {
+                    content += '<option value="' + data[i].systemFromName + '" id="' + data[i].id + '">' + data[i].name + '</option>'
+                }
+                $("#querySystemFrom").html(content);
+                $('.selectpicker').selectpicker('refresh');
+            },
+            'json'
+        );
+    })
+    //下拉框（三方渠道）
+    $(function () {
+        $.post(
+            "/pc/view/recheckorder/selectOrder",
+            {},
+            function (data) {
+                var data = data.content;
+                var content = '<option value="" >全部</option>';
+                for (var i in data) {
+                    content += '<option value="' +data[i] + '" >' + data[i] + '</option>'
+                }
+                $("#queryThiredPayType").html(content);
+                $('.selectpicker').selectpicker('refresh');
+            },
+            'json'
+        );
+    })
+    //全选、全不选
+    $(document).ready(function () {
+
+        $("#checkedAll").click(function () {
+            if ($(this).attr("checked")) { // 全选
+                $("input[name='checkBox1']").each(function () {
+                    $(this).attr("checked", true);
+                });
+            }
+            else { // 取消全选
+                $("input[name='checkBox1']").each(function () {
+                    $(this).attr("checked", false);
+                });
+            }
+        });
+
+    });
+    //单条复审记录插入
+    function oneinsert(self) {
+        var chk_value = [];
+        var temp = $(self).prev(".temp_data").html()
+        var tempObj = JSON.parse(temp);
+        var id =  tempObj.id;
+        chk_value.push(id)
+        $.ajax({
+            type: 'POST',
+            url: "/pc/view/recheckorder/batchinsert?chk_value=" + chk_value,
+            success: function (data) {
+                var a = $.parseJSON(data);
+                var count = chk_value.length;
+                if(a=count){
+                    layer.open({
+                        type:'0',
+                        icon: 1,
+                        title: '提示',
+                        btn:['确定'],
+                        btnAlign: 'c',
+                        content: '复审成功。',
+                        yes:function (index, layero) {
+                            $('input[name="checkBox1"]:checked').attr("checked",false);
+                            layer.close(index);
+                            setTimeout(function(){
+                                window.location.reload();//刷新当前页面.
+                            },500)
+                        }, btn2: function(index, layero){
+                            layer.close(index);
+                        }
+                    });
+                    return;
+                }
+            },
+        });
+
+
+    }
+
+  //批量绑定复选框
+    function batchinsert(self) {
+
+            var checkedBox = $("input[name='checkBox1']:checked");
+        if (checkedBox.length == 0) {
+                layer.open({
+                    type:'0',
+                    icon: 1,
+                    title: '提示',
+                    btn:['确定'],
+                    btnAlign: 'c',
+                    content: '请选择需要复审的订单！',
+                    yes:function (index, layero) {
+                        layer.close(index);
+                    }, btn2: function(index, layero){
+                        layer.close(index);
+                    }
+                });
+                return;
+            } else {
+                var chk_value = [];
+                $('input[name="checkBox1"]:checked').each(function () {
+                    chk_value.push($(this).val());
+                });
+                $.ajax({
+                    type: 'POST',
+                    url: "/pc/view/recheckorder/batchinsert?chk_value=" + chk_value,
+                    success: function (data) {
+                        var a = $.parseJSON(data);
+                         var count = chk_value.length;
+                         if(a=count){
+                             layer.open({
+                                 type:'0',
+                                 icon: 1,
+                                 title: '提示',
+                                 btn:['确定'],
+                                 btnAlign: 'c',
+                                 content: '成功复审'+count+'条复审订单。',
+                                 yes:function (index, layero) {
+                                     $('input[name="checkBox1"]:checked').attr("checked",false);
+                                     layer.close(index);
+                                     setTimeout(function(){
+                                         window.location.reload();//刷新当前页面.
+                                     },500)
+                                 }, btn2: function(index, layero){
+                                     layer.close(index);
+                                 }
+                             });
+                             return;
+                         }
+                    },
+                });
+            }
+
+        
+    }
+    //鼠标悬浮，清空title所有数据
+    $("#example").on("mouseenter",".ph_tableShow",function(){
+        $(this).attr("title","")
+    })
+    //下载处理订单记录
+    //下载处理订单记录
+    function downloadPay() {
+        var checkedBox = $("input[name='checkBox1']:checked");
+        if (checkedBox.length == 0) {
+            layer.open({
+                type: '0',
+                icon: 1,
+                title: '提示',
+                btn: ['确定', '取消'],
+                closeBtn: 0,
+                btnAlign: 'c',
+                content: '您确定要下载当前的记录吗?',
+                yes: function (index, layero) {
+                    layer.close(index);
+                    var queryIds = $("#orderIds").val();
+                    var str= JSON.parse(sessionStorage.getItem("ida"));
+                    $('input[name="checkBox1"]').each(function () {
+                        if($.inArray($(this).val(),str)!=-1) {
+                            str.splice($.inArray($(this).val(), str), 1);
+                        }
+                        document.location.href = "/pc/view/recheckorder/downloadPay?chk_value="+queryIds;
+                        sessionStorage.clear();
+                    });
+                }, btn2: function (index, layero) {
+                    layer.close(index);
+                }
+            });
+
+            return;
+        }else{
+            // alert(chk_value);
+            layer.open({
+                type: '0',
+                icon: 1,
+                title: '提示',
+                btn: ['确定', '取消'],
+                closeBtn: 0,
+                btnAlign: 'c',
+                content: '您确定要下载当前绑定的记录吗?',
+                yes: function (index, layero) {
+                    layer.close(index);
+                    var str= JSON.parse(sessionStorage.getItem("ida"));
+                    $('input[name="checkBox1"]').each(function () {
+                        if($.inArray($(this).val(),str)!=-1) {
+                            str.splice($.inArray($(this).val(), str), 1);
+                        }
+
+                        $('input[name="checkBox1"]:checked').each(function () {
+                            str.push($(this).val());
+                        });
+                        document.location.href = "/pc/view/recheckorder/downloadPay?chk_value="+str;
+                        sessionStorage.clear();
+                    });
+
+                    layer.alert("导出成功！")
+                    setTimeout(function(){
+                        window.location.reload();//刷新当前页面.
+                    },1000)
+                }, btn2: function (index, layero) {
+                    layer.close(index);
+                }
+            });
+        }
+
+    }
+    $(document).on("click","#checkedAll",function () {
+        var check = $(this).prop("checked");
+        $(".checkchild").prop("checked", check);
+    })
+
+    function clearData() {
+        $("#addLogisticForm")[0].reset();
+    }
+
+    function reset() {
+        $("#thirdPayType").selectpicker('val', "");
+        $("#selectSystemName").selectpicker('val', "");
+
+      //  tb.draw();
+
+
+        $("#queryForm")[0].reset();
+
+
+    }
+    //条件查询重新加载数据
+    function query() {
+        tb.draw();
+    }
+    ;
+
+    //查看
+    function editById(data) {
+        var temp = $(data).prev(".temp_data").html()
+        var tempObj = JSON.parse(temp);
+
+        $("#orderNum2").val(tempObj.order_num);
+        $("#sendContext2").html(tempObj.send_context);
+        $("#synReturnContext2").val(tempObj.syn_return_context);
+        $("#aynUrl2").val(tempObj.ayn_url);
+        layer.open({
+            type: 1,
+            title: '查看',
+            closeBtn: 0,
+            area: ['600px', '500px'],
+            btn: ['确定'],
+            btnAlign: 'c',
+            content: $('#findLinkmanBox'),
+            yes: function (index, layero) {
+                layer.close(index);
+            }
+        });
+    }
+    $(createTimeStr).datepicker(
+            {
+                language: "zh-CN",
+                autoclose: true,
+                startView: 0,
+                format: "yyyy-mm-dd",
+                clearBtn: true,
+                todayBtn: false,
+                endDate: new Date()
+            }).on('changeDate', function (ev) {
+        if (ev.date) {
+            $(createTimeEnd).datepicker('setStartDate', new Date(ev.date.valueOf()))
+        } else {
+            $(createTimeEnd).datepicker('setStartDate', null);
+        }
+    })
+
+    $(createTimeEnd).datepicker(
+            {
+                language: "zh-CN",
+                autoclose: true,
+                startView: 0,
+                format: "yyyy-mm-dd",
+                clearBtn: true,
+                todayBtn: false,
+                endDate: new Date()
+            }).on('changeDate', function (ev) {
+        if (ev.date) {
+            $(createTimeStr).datepicker('setEndDate', new Date(ev.date.valueOf()))
+        } else {
+            $(createTimeStr).datepicker('setEndDate', new Date());
+        }
+
+    })
+
+    // 原生写法 js 实现匹配空格删除
+    var mer_url = document.getElementsByTagName('input');
+    for (var i = 0; i < mer_url.length; i++) {
+        mer_url[i].onblur = function() {
+            //   console.log();
+            this.value = Trim(this.value);
+        };
+    }
+
+    // 监测空格函数 如果有空格替换成空
+    function Trim(str) {
+        return str.replace(/\s+/g,"");
+
+
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.permission.UserMapper">
+
+    <!-- 基础查询条件-->
+    <sql id="baseCondition">
+        <trim prefix="where" prefixOverrides="and">
+            <if test="id!=null and id!=''">
+                and u.id =#{id}
+            </if>
+            <if test="userName!=null and userName!=''">
+                and u.userName =#{userName}
+            </if>
+            <if test="telphone!=null and telphone!=''">
+                and u.telphone =#{telphone}
+            </if>
+            <if test="isable !=null and isable != '' and isable != '-1'">
+                and u.isable =#{isable}
+            </if>
+        </trim>
+    </sql>
+
+    <!-- 基础查询字段-->
+    <sql id="baseSelect">
+		SELECT
+			u.id,
+			u.userName,
+			u.telphone,
+			u.password,
+			u.loginTime,
+			u.createTime,
+			u.isable,
+			u.otp_code as otpCode
+	</sql>
+
+
+    <!-- 根据用户手机号查询用户信息-->
+	<select id="findUserByPhone" resultType="com.zc.entity.permission.User">
+        <include refid="baseSelect"/>
+		FROM
+        alq_permission_common_user u
+		WHERE
+        u.telphone = #{telphone}
+	</select>
+
+
+	<!-- 分页获取所有用户 -->
+    <select id="getUserByPage" resultType="com.zc.vo.permission.UserVO"
+            parameterType="com.zc.dto.permission.UserDTO">
+        <include refid="baseSelect"/>
+		FROM
+		  alq_permission_common_user u
+		<where>
+			u.id not in(
+				select
+            userId
+				from 
+					alq_permission_user_role ur
+            inner join alq_permission_role r on ur.roleId = r.id and r.roleCode in(2,3,4,5,6)
+			)
+			<if test="id!=null and id!=''">
+				and u.id =#{id}
+			</if>
+			<if test="userName!=null and userName!=''">
+				and u.userName =#{userName}
+			</if>
+
+			<if test="telphone !=null and telphone !=''">
+				AND u.telphone LIKE CONCAT(CONCAT('%', #{telphone}), '%')
+			</if>
+			<if test="isable != null and isable != ''">
+				AND u.isable = #{isable}
+			</if>
+		</where>
+        ORDER BY u.id ASC
+	</select>
+
+	<!-- 根据条件查询用户对象 -->
+	<select id="getUserByCondition" parameterType="com.zc.dto.permission.UserDTO"
+			resultType="com.zc.vo.permission.UserVO">
+        <include refid="baseSelect"/>
+		FROM
+        alq_permission_common_user u
+		
+        <include refid="baseCondition"/>
+	</select>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" >
+	INSERT INTO `alq_permission_common_user`
+	 ( `userName`, `telphone`, `password`, `isable`, `loginTime`, `createrId`, `updaterId`, `createTime`, `updateTime`,`creater_id`, `updater_id`) 
+	 VALUES ( #{userName}, #{telphone}, #{password}, #{isable},  now(),  #{createrId}, #{updaterId},now(), now(), #{createrId}, #{updaterId});
+	</insert>
+	
+	<update id="updateByPrimaryKey"  parameterType="com.zc.entity.permission.User">
+	update alq_permission_common_user set password =#{password} 
+	<if test="userName !='' and userName!=null">
+	,userName=#{userName}
+	</if>
+	<if test="telphone !='' and telphone!=null">
+	,telphone=#{telphone}
+	</if>
+	where id=#{id}
+	</update>
+	
+	
+	<select id="selectByPrimaryKey" parameterType="long" resultType="com.zc.entity.permission.User">
+	select * from alq_permission_common_user where id=#{id}
+	</select>
+</mapper>

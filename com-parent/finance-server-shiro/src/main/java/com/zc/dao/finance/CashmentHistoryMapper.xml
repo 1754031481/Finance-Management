@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.finance.CashmentHistoryMapper">
+
+    <select id="getlist" resultType="com.zc.entity.finance.Finance">
+        SELECT f.id, f.createdTime, s.name as project, f.totalCount, f.totalMoney,f.status
+        FROM (
+              SELECT id,created_time AS createdTime, project, total_count AS totalCount,
+              total_money AS totalMoney,status
+              FROM `finance`
+              ORDER BY created_time DESC
+              LIMIT 0,18446744073709551615) f
+              left join system_from s on f.project=s.system_from_name
+        GROUP BY f.project
+        ORDER BY f.createdTime DESC
+    </select>
+
+    <select id="getWeekData" parameterType="java.lang.String" resultType="com.zc.entity.finance.Finance">
+        SELECT f.id,f.created_time AS createdTime,s.name as project, f.total_count AS totalCount,f.total_money AS totalMoney,f.status
+        FROM `finance` f
+        LEFT JOIN system_from s on s.system_from_name = f.project
+        WHERE s.name = #{project} and DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= date(f.created_time)
+        ORDER BY f.created_time DESC
+        LIMIT 1,99999
+    </select>
+
+    <update id="updateStatus">
+        update finance set
+        <if test="status==0">
+            status=1
+        </if>
+        <if test="status==1">
+            status=0
+        </if>
+        ,update_time=now()
+        where id=#{id}
+    </update>
+
+    <insert id="insertLog" parameterType="com.zc.entity.logs.LoginOperatingLogs">
+        INSERT into login_operating_logs(created_time,update_time,operation_logs,create_user,created_ip) values(now(),now(),#{operationLogs},#{createUser},#{createdIp})
+    </insert>
+
+    <select id="selectById" parameterType="java.lang.Long" resultType="com.zc.entity.finance.Finance">
+        select * from finance where id = #{id} limit 1
+    </select>
+</mapper>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.finance.CashChannelSettingsMapper">
+
+    <select id="getlist" resultType="com.zc.vo.project.ProjectSupportVO">
+        SELECT id, `name` AS projectName ,third_pay_type_cash AS cashInterface, support_statue AS  supportStatue
+        FROM `system_from`
+        ORDER BY created_time DESC
+    </select>
+
+    <update id="updateSettings" parameterType="com.zc.vo.project.ProjectSupportVO">
+        UPDATE system_from
+        SET update_time = NOW(), third_pay_type_cash = #{cashInterface}, support_statue = #{supportStatue}
+        WHERE id = #{id}
+    </update>
+</mapper>

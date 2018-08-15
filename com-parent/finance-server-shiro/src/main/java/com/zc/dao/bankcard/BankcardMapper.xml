@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.bankcard.BankcardMapper">
+
+    <!-- 获取列表数据 -->
+    <select id="getBankcardList" resultType="com.zc.entity.bankcard.Bankcard">
+        select
+        id,
+        bankcard_num as bankcardNum,
+        bank_name as bankName,
+        bankcard_user as bankcardUser,
+        status
+        from test_bank_card
+        where  is_delete=0
+        order by created_time desc
+    </select>
+
+
+    <update id="updateStatus">
+        update test_bank_card set
+        <if test="status==0">
+            status=1
+        </if>
+        <if test="status==1">
+            status=0
+        </if>
+        ,update_time=now()
+        where id=#{id}
+    </update>
+
+    <select id="selectByBankcardNum" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(1) from test_bank_card where bankcard_num=#{bankcardNum} and is_delete=0
+    </select>
+
+    <update id="deleteBankcard">
+        update test_bank_card set is_delete=1,update_time=now() where id=#{id}
+    </update>
+
+    <insert id="insertLog" parameterType="com.zc.entity.logs.LoginOperatingLogs">
+        INSERT into login_operating_logs(created_time,update_time,operation_logs,create_user,created_ip) values(now(),now(),#{operationLogs},#{createUser},#{createdIp})
+    </insert>
+
+    <insert id="insertBankcard"  parameterType="com.zc.entity.bankcard.Bankcard" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO test_bank_card(created_time,update_time,bankcard_num,bank_name,bankcard_user,status,is_delete)
+        values(#{createdTime},#{updateTime},#{bankcardNum},#{bankName},#{bankcardUser},#{status},0)
+    </insert>
+
+    <select id="selectBankcardById" parameterType="java.lang.Long" resultType="com.zc.entity.bankcard.Bankcard">
+        select id,
+        created_time as createdTime,
+        update_time as updateTime,
+        bankcard_num as bankcardNum,
+        bank_name as bankName,
+        bankcard_user as bankcardUser,
+        status,
+        is_delete as isDelete
+        from test_bank_card
+        where id=#{id}
+        limit 1
+    </select>
+</mapper>

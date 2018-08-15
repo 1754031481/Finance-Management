@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.ffconfig.FfCashConfigMapper">
+
+    <sql id="baseSelect">
+		SELECT
+		id,
+       merid,
+       private_key,
+       rer_url,
+       root_url,
+       req_type,
+       user_id,
+       voucher
+	</sql>
+
+
+    <select id="findFfCashConfig" resultType="map" >
+        <include refid="baseSelect"/>  FROM ff_cash_config   ORDER BY created_time DESC
+    </select>
+
+    <select id="findCashConfig" resultType="Map">
+       SELECT id,private_key,rer_url,root_url FROM ff_cash_config  WHERE  id = #{ffCashId}
+    </select>
+
+
+    <update id="updateFfCashConfig" parameterType="com.zc.entity.ffconfig.FFCashConfig">
+       UPDATE ff_cash_config
+        <set>
+            <if test="merID != null">merid=#{merID},</if>
+            <if test="privateKey != null">private_key=#{privateKey},</if>
+            <if test="reqType != null">req_type=#{reqType},</if>
+            <if test="rerUrl != null">rer_url=#{rerUrl},</if>
+            <if test="rootUrl != null">root_url=#{rootUrl},</if>
+            <if test="userId != null">user_id=#{userId},</if>
+            <if test="voucher != null">voucher=#{voucher},</if>
+        </set>
+        WHERE   id = #{id}
+    </update>
+    
+    <insert id="addFfCashConfig"  parameterType="com.zc.entity.ffconfig.FFCashConfig"  >
+        INSERT INTO  ff_cash_config  (created_time, update_time,merid,private_key,req_type,rer_url,root_url,user_id,voucher)
+            VALUES (#{createdTime},#{updateTime},#{merID},#{privateKey},#{reqType},#{rerUrl},#{rootUrl},#{userId},#{voucher})
+    </insert>
+
+</mapper>

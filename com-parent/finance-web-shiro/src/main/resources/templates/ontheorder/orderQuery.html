@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+
+<head>
+    <meta charset="UTF-8">
+    <title>查询订单列表</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common/models.css}">
+    <!--bootstrap-select  css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/bootstrapselect/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/bootstrapselect/css/bootstrap-select.css}"/>
+    <!--文件树插件 css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/ztree/zTreeStyle.css}">
+    <!--日期  css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/datepicker/css/bootstrap-datepicker.css}">
+    <style>
+        #filename {
+            width: 67px !important;
+        }
+
+        #SWFUpload_0 {
+            width: 67px !important;
+        }
+
+        #filename-button {
+            background-repeat: no-repeat;
+            width: 67px !important;
+        }
+    </style>
+
+</head>
+<body onUnload="clean()">
+<input type="hidden" id="orderIds">
+<form action="/pc/view/ontheorder/downloadOrder" method="post" id="downForm">
+    <input type="hidden" name="ids" id="ids">
+</form>
+<div class="MainContent">
+    <!--面包屑-->
+    <div class="current">当前位置：<a href="#">关于订单</a>&nbsp;&gt;&nbsp;<span>订单查询</span></div>
+    <!--end 面包屑-->
+    <!--主体内容-->
+    <div class="MainCont">
+        <!--标题-->
+
+        <div class="ph_subTit">
+            <h2>订单查询列表</h2>
+            <div class="ph_snbBtn">
+                <input class="Js_deliver" name="" type="button" onclick="download()" value="导出数据">
+            </div>
+            <!--<shiro:hasPermission name="topicAdd">-->
+            <!--</shiro:hasPermission>-->
+        </div>
+
+        <form id="queryForm">
+            <div class="ph_screen">
+                <table class="ph_tableBox">
+                    <tr>
+                        <th>三方渠道：</th>
+                        <td><select  id="queryThiredPayType" name="queryThiredPayType"></select></td>
+                        <th>订单号：</th>
+                        <td><input type="text" id="queryOrderNum" name="queryOrderNum"></td>
+                        <th>订单时间：</th>
+                        <td>
+                            <p class="dayBox">
+                                <input class="start_rise date startDate" name="" type="text" id="createTimeStr"
+                                       style="width: 98px">&nbsp;-&nbsp;
+                                <input class="start_rise date endDate" name="" type="text" id="createTimeEnd"
+                                       style="width: 98px">
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>业务来源：</th>
+                        <td><select  id="querySystemFrom" name="querySystemFrom"></select></td>
+                        <th>订单状态：</th>
+                        <td><select  id="payStatus" name="payStatus">
+                            <option value="" >全部</option>
+                            <option value="2" >成功</option>
+                            <option value="3" >失败</option>
+                            <option value="1" >处理中</option>
+                        </select></td>
+                    </tr>
+                </table>
+                <center>
+                    <input name="" type="button" onclick="query();" value="查询">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <input name="" type="button" onclick="reset();" value="重置">
+                </center>
+            </div>
+        </form>
+
+
+        <!--end 标题-->
+        <!--查询订单列表-->
+        <div class="ph_wareBox">
+            <table class="ph_wareList" id="example"></table>
+        </div>
+        <!--end 查询订单列表-->
+    </div>
+    <!--end 主体内容-->
+</div>
+
+
+<!-- 查看弹窗-->
+<div class="PopupBox" id="findLinkmanBox">
+    <!--关闭按钮-->
+    <a href="javascript: void(0);" class="close"></a>
+    <!--end 关闭按钮-->
+    <!--内容-->
+    <div class="PopupCon">
+        <div class="ph_subPoCon ph_screen">
+            <form class="form-inline" id="addFindLogisticForm">
+                <table class="ph_tableBox">
+                    <input id="id" name="id" hidden="hidden"/>
+                    <tr>
+                        <th><span class="require">*</span>订单号：</th>
+                        <td><input name="publicSign" type="text" id="orderNum2" disabled="true"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>请求报文：</th>
+                        <td><!--<textarea id="sendContext2" disabled="true"></textarea>-->
+                            <div id="sendContext2"
+                                 style="background: #eee;max-height: 200px;padding:0 10px;overflow: auto;"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>异步报文：</th>
+                        <td><textarea id="synReturnContext2" disabled="true"></textarea></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>异步回调地址：</th>
+                        <td><textarea id="aynUrl2" disabled="true"></textarea></td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+
+    </div>
+    <!--end 内容-->
+</div>
+<!--end查看弹窗-->
+
+
+<!--遮罩层-->
+<div class="maskBox"></div>
+</div>
+
+<!--操作框 -->
+<div id="handle">
+</div>
+<!--end 操作框-->
+
+<script type="text/javascript" th:src="@{/js/common/jquery-1.11.1.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/common/index.js}"></script>
+<!--bootstrap-select-->
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/bootstrap-select.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/select.js}"></script>
+<!--分页-->
+<script type="text/javascript" th:src="@{/js/plugins/pages/jquery.dataTables.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/layer/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/spm/spmExtends.js}"></script>
+<!--bootstrap-select-->
+
+<!--日期控件-->
+<script type="text/javascript" th:src="@{/js/plugins/datepicker/bootstrap-datepicker.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/datepicker/jquery.timepicker.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/datepicker/jquery.datepair.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/datepicker/datepicker.js}"></script>
+
+<!-- 验证 -->
+<script type="text/javascript" th:src="@{/js/plugins/validat/jquery.validationEngine.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/validat/jquery.validationEngine-zh_CN.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/common/util.js}"></script>
+
+<!--文件树插件-->
+<!--<script type="text/javascript" th:src="@{/static/js/plugins/ztree/jquery-1.4.4.min.js}"></script>-->
+<script type="text/javascript" th:src="@{/js/plugins/ztree/jquery.ztree.core.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/ztree/jquery.ztree.excheck.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/datepicker/bootstrap-datepicker.js}"></script>
+<!--上传图片-->
+<script type="text/javascript" th:inline="javascript">
+    /* 文本编译，过滤js代码，html标签 */
+    var HtmlEncode = function (str) {
+        var hex = new Array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f');
+        var preescape = str;
+        var escaped = "";
+        for (var i = 0; i < preescape.length; i++) {
+            var p = preescape.charAt(i);
+            escaped = escaped + escapeCharx(p);
+        }
+
+        return escaped;
+
+        function escapeCharx(original) {
+            var found = true;
+            var thechar = original.charCodeAt(0);
+            switch (thechar) {
+                case 10:
+                    return "<br/>";
+                    break; //newline
+                case 32:
+                    return "&nbsp;";
+                    break; //space
+                case 34:
+                    return "&quot;";
+                    break; //"
+                case 38:
+                    return "&amp;";
+                    break; //&
+                case 39:
+                    return "&#x27;";
+                    break; //'
+                case 47:
+                    return "&#x2F;";
+                    break; // /
+                case 60:
+                    return "&lt;";
+                    break; //<
+                case 62:
+                    return "&gt;";
+                    break; //>
+                case 198:
+                    return "&AElig;";
+                    break;
+                case 193:
+                    return "&Aacute;";
+                    break;
+                case 194:
+                    return "&Acirc;";
+                    break;
+                case 192:
+                    return "&Agrave;";
+                    break;
+                case 197:
+                    return "&Aring;";
+                    break;
+                case 195:
+                    return "&Atilde;";
+                    break;
+                case 196:
+                    return "&Auml;";
+                    break;
+                case 199:
+                    return "&Ccedil;";
+                    break;
+                case 208:
+                    return "&ETH;";
+                    break;
+                case 201:
+                    return "&Eacute;";
+                    break;
+                case 202:
+                    return "&Ecirc;";
+                    break;
+                case 200:
+                    return "&Egrave;";
+                    break;
+                case 203:
+                    return "&Euml;";
+                    break;
+                case 205:
+                    return "&Iacute;";
+                    break;
+                case 206:
+                    return "&Icirc;";
+                    break;
+                case 204:
+                    return "&Igrave;";
+                    break;
+                case 207:
+                    return "&Iuml;";
+                    break;
+                case 209:
+                    return "&Ntilde;";
+                    break;
+                case 211:
+                    return "&Oacute;";
+                    break;
+                case 212:
+                    return "&Ocirc;";
+                    break;
+                case 210:
+                    return "&Ograve;";
+                    break;
+                case 216:
+                    return "&Oslash;";
+                    break;
+                case 213:
+                    return "&Otilde;";
+                    break;
+                case 214:
+                    return "&Ouml;";
+                    break;
+                case 222:
+                    return "&THORN;";
+                    break;
+                case 218:
+                    return "&Uacute;";
+                    break;
+                case 219:
+                    return "&Ucirc;";
+                    break;
+                case 217:
+                    return "&Ugrave;";
+                    break;
+                case 220:
+                    return "&Uuml;";
+                    break;
+                case 221:
+                    return "&Yacute;";
+                    break;
+                case 225:
+                    return "&aacute;";
+                    break;
+                case 226:
+                    return "&acirc;";
+                    break;
+                case 230:
+                    return "&aelig;";
+                    break;
+                case 224:
+                    return "&agrave;";
+                    break;
+                case 229:
+                    return "&aring;";
+                    break;
+                case 227:
+                    return "&atilde;";
+                    break;
+                case 228:
+                    return "&auml;";
+                    break;
+                case 231:
+                    return "&ccedil;";
+                    break;
+                case 233:
+                    return "&eacute;";
+                    break;
+                case 234:
+                    return "&ecirc;";
+                    break;
+                case 232:
+                    return "&egrave;";
+                    break;
+                case 240:
+                    return "&eth;";
+                    break;
+                case 235:
+                    return "&euml;";
+                    break;
+                case 237:
+                    return "&iacute;";
+                    break;
+                case 238:
+                    return "&icirc;";
+                    break;
+                case 236:
+                    return "&igrave;";
+                    break;
+                case 239:
+                    return "&iuml;";
+                    break;
+                case 241:
+                    return "&ntilde;";
+                    break;
+                case 243:
+                    return "&oacute;";
+                    break;
+                case 244:
+                    return "&ocirc;";
+                    break;
+                case 242:
+                    return "&ograve;";
+                    break;
+                case 248:
+                    return "&oslash;";
+                    break;
+                case 245:
+                    return "&otilde;";
+                    break;
+                case 246:
+                    return "&ouml;";
+                    break;
+                case 223:
+                    return "&szlig;";
+                    break;
+                case 254:
+                    return "&thorn;";
+                    break;
+                case 250:
+                    return "&uacute;";
+                    break;
+                case 251:
+                    return "&ucirc;";
+                    break;
+                case 249:
+                    return "&ugrave;";
+                    break;
+                case 252:
+                    return "&uuml;";
+                    break;
+                case 253:
+                    return "&yacute;";
+                    break;
+                case 255:
+                    return "&yuml;";
+                    break;
+                case 162:
+                    return "&cent;";
+                    break;
+                case '\r':
+                    break;
+                default:
+                    found = false;
+                    break;
+            }
+            if (!found) {
+                if (thechar > 127) {
+                    var c = thechar;
+                    var a4 = c % 16;
+                    c = Math.floor(c / 16);
+                    var a3 = c % 16;
+                    c = Math.floor(c / 16);
+                    var a2 = c % 16;
+                    c = Math.floor(c / 16);
+                    var a1 = c % 16;
+                    return "&#x" + hex[a1] + hex[a2] + hex[a3] + hex[a4] + ";";
+                } else {
+                    return original;
+                }
+            }
+        }
+    }
+
+    var tb;
+    /*var sessionUser = [[${session.login_back_session}]];*/
+
+    $(function () {
+        /*  var Popupe = new PopupBase();
+         Popupe.show('.ph_wareBox', '.Js_btn', '.maskBox,.DeterBox');
+         Popupe.showHide('.subQuemit', '.refundBox,.deliverBox,.menuTreeBox', '.SucBox');
+         Popupe.show('.ph_snbBtn,.ph_wareBox', '.Js_deliver', '.maskBox,.deliverBox');
+         Popupe.show('.ph_wareBox', '.Js_menuTree', '.maskBox,.menuTreeBox');
+         Popupe.hide('.close', '.maskBox,.DeterBox,.SucBox,.deliverBox,.menuTreeBox');*/
+        tb = $('#example').DataTable({
+            "lengthChange": false,
+            "ordering": false,
+            "searching": false,
+            "bServerSide": true,
+            "autoWidth": false,
+            "sPaginationType": "full_numbers",
+            "bJQueryUI": true,
+            "sDom": '<"">t<"F"ip>',
+            "sAjaxSource": "/pc/view/ontheorder/list", //ajax调用接口===============================调用接口=====================================
+            "aoColumnDefs": [{sDefaultContent: '', aTargets: ['_all']}],
+            "aoColumns": [
+                {"sWidth": "50px",  "sClass": "center", "bSortable": false,"sTitle":"<input type='checkbox'  id='checkall'/>","class": "sClass", "mRender": function (data, type, full) {
+
+                    return '<input type="checkbox"  class="checkchild"  name="check" value="' + full.id + '" />';
+                }},
+                {"sWidth": "50px", "sTitle": "序号", "mData": "id", "title": "id"},
+                {"sWidth": "300px","sTitle": "订单号", "mData": "order_num", "class": "sClass"},
+                {"sTitle": "订单创建时间", "mData": "created_time", "class": "sClass"},
+                {"sTitle": "三方渠道", "mData": "third_pay_type", "class": "sClass"},
+                {"sTitle": "交易金额", "mData": "money", "class": "sClass"},
+                {
+                    "sTitle": "订单状态", "mData": "pay_status", "class": "sClass", "mRender": function (data, type, full) {
+                    var text;
+                    if (full.pay_status == "1") {
+                        text = "处理中";
+                    } else if (full.pay_status == "2") {
+                        text = "成功";
+                    } else if (full.pay_status == "3") {
+                        text = "失败";
+                    }
+                    return text;
+                }
+                },
+                {
+                    "sWidth": "110px",
+                    "sTitle": "操作",
+                    "mData": "id",
+                    "sClass": "ph_tableShow",
+                    "mRender": function (data, type, full) {
+                        var obj2str = JSON.stringify(full)
+                        //console.log(full)
+                        var text = '<div class="ph_operateBox"><input class="ph_operate" name="" type="button" value="操作选项">';
+                        text = text + '<ul class="ph_operateList hide" role="menu">';
+//                        text += '<li ><a href="#" onclick="editById(\'' + full.order_num + '\',\'' + full.send_context + '\',\'' + full.syn_return_context + '\',\'' + full.ayn_url + '\');">查看</a> </li>';
+                        text += '<li ><div class="temp_data" style="display:none">' + HtmlEncode(obj2str) + '</div><a href="#" onclick="editById(this);">查看</a> </li>';
+                        text = text + '</ul></div>';
+                        return text;
+                    }
+                }
+            ],
+            "oLanguage": {
+                "sProcessing": "数据加载中······",
+                "sLengthMenu": "显示 _MENU_ 条记录",
+                "sZeroRecords": "没有您要搜索的内容！",
+                "sEmptyTable": "列表中无数据存在！",
+                "sInfo": "当前显示 _START_ 到 _END_ 条数据，共 _TOTAL_ 条数据",
+                "sInfoEmpty": "显示 0 到 0 条记录",
+                "sInfoFiltered": "数据列表中共  _MAX_ 条记录",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上一页",
+                    "sNext": "下一页",
+                    "sLast": "末页"
+                }
+            },
+            "fnServerData": function (sSource, aoData, fnCallback, oSettings) {
+
+                var str= JSON.parse(sessionStorage.getItem("ids"));
+                if(str==null){
+                    str=new Array();
+                }
+                $('input[name="check"]').each(function () {
+                    if($.inArray($(this).val(),str)!=-1) {
+                        str.splice($.inArray($(this).val(), str), 1);
+                    }
+                });
+                $('input[name="check"]:checked').each(function () {
+                    str.push($(this).val())
+                });
+                sessionStorage.setItem("ids",JSON.stringify(str));
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "GET",
+                    "async": 'false',
+                    "url": sSource,
+                    "data": {
+                        'pageNum': (aoData[3].value / aoData[4].value) + 1,
+                        'pageSize': aoData[4].value,
+                        'createdTime': $('#createTimeStr').val(),
+                        'updateTime': $('#createTimeEnd').val(),
+                        'orderNum': $('#queryOrderNum').val(),
+                        'thirdPayType': $('#queryThiredPayType').val(),
+                        'fromSystem':$('#querySystemFrom').val(),
+                        'payStatus':$('#payStatus').val(),
+                    },
+                    "success": function(resp) {
+                        $("#orderIds").val(resp.ids);
+                        fnCallback(resp);
+                    }
+                });
+              /*  setTimeout(function () {
+                    $("#checkall").removeProp("checked");
+                    var str = JSON.parse(sessionStorage.getItem("ids"));
+                    alert(str)
+                    $('input[name="check"]').each(function () {
+                        if($.inArray($(this).val(),str)!=-1) {
+                            $(this).prop("checked","checked");
+                        }
+                    });
+                },300)*/
+            },
+            "fnDrawCallback": function () {
+                var api = this.api();
+                var startIndex = api.context[0]._iDisplayStart;//获取到本页开始的条数
+                api.column(1).nodes().each(function (cell, i) {
+                    cell.innerHTML = startIndex + i + 1;
+                });
+                
+                $("#checkall").removeProp("checked");
+                var str = JSON.parse(sessionStorage.getItem("ids"));
+                $('input[name="check"]').each(function () {
+                    if($.inArray($(this).val(),str)!=-1) {
+                        $(this).prop("checked","checked");
+                    }
+                });
+            }
+
+        });
+        //验证初始化
+        $('#addLogisticForm').validationEngine({
+            promptPosition: 'bottomLeft'
+            , autoPositionUpdate: false
+            , addPromptClass: 'formError-text'
+            , autoHidePrompt: true
+            , autoHideDelay: 3000
+            , fadeDuration: 0.3
+        });
+
+    });
+
+
+    function clearData() {
+        $("#addLogisticForm")[0].reset();
+    }
+
+    function reset() {
+        tb.draw();
+        $("#queryForm")[0].reset();
+    }
+    //条件查询重新加载数据
+    function query() {
+        tb.draw();
+    }
+    ;
+
+    //查看
+    function editById(data) {
+        var temp = $(data).prev(".temp_data").html()
+        var tempObj = JSON.parse(temp);
+
+        $("#orderNum2").val(tempObj.order_num);
+        $("#sendContext2").html(tempObj.send_context);
+        $("#synReturnContext2").val(tempObj.syn_return_context);
+        $("#aynUrl2").val(tempObj.ayn_url);
+        layer.open({
+            type: 1,
+            title: '查看',
+            closeBtn: 0,
+            area: ['600px', '500px'],
+            btn: ['确定'],
+            btnAlign: 'c',
+            content: $('#findLinkmanBox'),
+            yes: function (index, layero) {
+                layer.close(index);
+            }
+        });
+    }
+    $(createTimeStr).datepicker(
+            {
+                language: "zh-CN",
+                autoclose: true,
+                startView: 0,
+                format: "yyyy-mm-dd",
+                clearBtn: true,
+                todayBtn: false,
+                endDate: new Date()
+            }).on('changeDate', function (ev) {
+        if (ev.date) {
+            $(createTimeEnd).datepicker('setStartDate', new Date(ev.date.valueOf()))
+        } else {
+            $(createTimeEnd).datepicker('setStartDate', null);
+        }
+    })
+
+    $(createTimeEnd).datepicker(
+            {
+                language: "zh-CN",
+                autoclose: true,
+                startView: 0,
+                format: "yyyy-mm-dd",
+                clearBtn: true,
+                todayBtn: false,
+                endDate: new Date()
+            }).on('changeDate', function (ev) {
+        if (ev.date) {
+            $(createTimeStr).datepicker('setEndDate', new Date(ev.date.valueOf()))
+        } else {
+            $(createTimeStr).datepicker('setEndDate', new Date());
+        }
+
+    })
+
+    // 原生写法 js 实现匹配空格删除
+    var mer_url = document.getElementsByTagName('input');
+    for (var i = 0; i < mer_url.length; i++) {
+        mer_url[i].onblur = function() {
+            //   console.log();
+            this.value = Trim(this.value);
+        };
+    }
+
+    // 监测空格函数 如果有空格替换成空
+    function Trim(str) {
+        return str.replace(/\s+/g,"");
+    }
+
+    $(document).on("mouseenter",".ph_tableShow",function(){
+        $(this).attr("title","");
+    })
+
+    $(document).on("click","#checkall",function () {
+        var check = $(this).prop("checked");
+        $(".checkchild").prop("checked", check);
+    })
+
+    $(function () {
+        $.post(
+                "/web/alPay/getSelect",
+                {},
+                function (data) {
+                    var data = data.data;
+                    var content = '<option value="0" id="0">-----------请选择----------</option>';
+                    for (var i in data) {
+                        content += '<option value="' + data[i].systemFromName + '" id="' + data[i].id + '">' + data[i].name + '</option>'
+                    }
+                    $("#sel1").html(content);
+                },
+                'json'
+        );
+    })
+
+    $(function () {
+        $.post(
+                "/web/alPay/getSelect",
+                {},
+                function (data) {
+                    var data = data.data;
+                    var content = '<option value="" >全部</option>';
+                    for (var i in data) {
+                        content += '<option value="' + data[i].systemFromName + '" id="' + data[i].id + '">' + data[i].name + '</option>'
+                    }
+                    $("#querySystemFrom").html(content);
+                },
+                'json'
+        );
+    })
+
+    $(function () {
+        $.post(
+                "/pc/view/ontheorder/getChannelSel",
+                {},
+                function (data) {
+                    var data = data.content;
+                    var content = '<option value="" >全部</option>';
+                    for (var i in data) {
+                        content += '<option value="' +data[i] + '" >' + data[i] + '</option>'
+                    }
+                    $("#queryThiredPayType").html(content);
+                },
+                'json'
+        );
+    })
+
+    //导出数据
+    function download() {
+        layer.open({
+            type: '0',
+            icon: 1,
+            title: '提示',
+            btn: ['确定', '取消'],
+            closeBtn: 0,
+            btnAlign: 'c',
+            content: '您确定要导出数据吗?',
+            yes: function (index, layero) {
+                layer.close(index);
+                var queryIds = $("#orderIds").val();
+                var str= JSON.parse(sessionStorage.getItem("ids"));
+                $('input[name="check"]').each(function () {
+                    if($.inArray($(this).val(),str)!=-1) {
+                        str.splice($.inArray($(this).val(), str), 1);
+                    }
+                });
+                $('input[name="check"]:checked').each(function () {
+                    str.push($(this).val())
+                });
+               /* if(str.length==0){
+                    document.location.href = "/pc/view/ontheorder/downloadOrder?ids="+queryIds;
+                }else {
+                    document.location.href = "/pc/view/ontheorder/downloadOrder?ids=" + str;
+                }*/
+                if(str.length==0){
+                    $("#ids").val(queryIds);
+                }else{
+                    $("#ids").val(str);
+                }
+                $("#downForm").submit();
+                layer.alert("导出成功！")
+            }, btn2: function (index, layero) {
+                layer.close(index);
+            }
+        });
+    }
+
+    function clean() {
+        sessionStorage.removeItem("ids");
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.abouttesting.TestOrderLogsMapper">
+
+    <select id="getTestOrderLogs" parameterType="com.zc.entity.logs.TestOrderLogs" resultType="com.zc.entity.logs.TestOrderLogs">
+        SELECT `id`,
+            `create_user` AS createUser,
+            `created_time` AS createdTime,
+            `created_ip` AS createdIp,
+            `update_time` AS updateTime,
+            `create_time_log` AS createTimeLog,
+            `card_no` AS cardNo,
+            `person_name` AS personName,
+            `bank_sub` AS bankSub,
+            `comments` AS comments,
+            `third_pay_type` AS thirdPayType,
+            `mer_seq_id` AS merSeqId
+        FROM `test_order_logs`
+        WHERE 1 = 1
+        <if test="createUser != null">
+            AND create_user = #{createUser}
+        </if>
+        <if test="createdTime != null">
+            AND DATE_FORMAT(created_time,'%Y-%m-%d') = DATE_FORMAT(#{createdTime},'%Y-%m-%d')
+        </if>
+        <if test="merSeqId != null">
+            AND mer_seq_id = #{merSeqId}
+        </if>
+        order by created_time desc
+    </select>
+</mapper>

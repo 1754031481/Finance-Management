@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <title>裕福配置(支付)</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common/models.css}">
+    <!--bootstrap-select  css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/bootstrapselect/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/bootstrapselect/css/bootstrap-select.css}"/>
+    <!--文件树插件 css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/ztree/zTreeStyle.css}">
+    <style>
+        #filename{
+            width: 67px !important;
+        }
+        #SWFUpload_0{
+            width: 67px !important;
+        }
+        #filename-button{
+            background-repeat: no-repeat;
+            width: 67px !important;
+        }
+    </style>
+
+</head>
+<body>
+<div class="MainContent">
+    <!--面包屑-->
+    <div class="current">当前位置：<a href="#">关于配置</a>&nbsp;&gt;&nbsp;<span>裕福配置(支付)</span></div>
+    <!--end 面包屑-->
+    <!--主体内容-->
+    <div class="MainCont">
+        <!--标题-->
+
+        <div class="ph_subTit">
+            <h2>裕福配置(支付)列表</h2>
+            <div class="ph_snbBtn">
+                <input class="Js_deliver" name="" type="button" value="添加">
+            </div>
+        </div>
+
+        <!--end 标题-->
+        <!--专题列表-->
+        <div class="ph_wareBox">
+            <table class="ph_wareList" id="example"></table>
+        </div>
+        <!--end 专题列表-->
+    </div>
+    <!--end 主体内容-->
+</div>
+
+
+<!--添加弹窗-->
+<div class="PopupBox" id="deliverBox">
+    <!--内容-->
+    <div class="PopupCon">
+        <div class="ph_subPoCon ph_screen">
+            <form id="addForm">
+                <table class="ph_tableBox">
+                    <input id="editId" name="id" type="hidden">
+                    <tbody><tr>
+                        <th><span class="require">*</span>商户id：</th>
+                        <td><input id="merchantId" class="validate[required, maxSize[50]]" name="merchantId" type="text">
+                            </input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>订单金额币种：</th>
+                        <td><input id="merchantOrderCurrency" class="validate[required, maxSize[50]]" name="merchantOrderCurrency" type="text">
+                            </input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>网关类型：</th>
+                        <td><input id="gwType" class="validate[required, maxSize[50]]" name="gwType" type="text">
+                            </input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>买家类型：</th>
+                        <td><input id="userType1" class="validate[required]" name="userType" type="radio" value="1" checked="checked">
+                            </input>个人
+                            <input id="userType2" class="validate[required]" name="userType" type="radio" value="2">
+                            </input>企业
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>商户唯一标识：</th>
+                        <td><input id="merchantUserId" class="validate[required, maxSize[50]]" name="merchantUserId" type="text">
+                            </input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>商户结算信息：</th>
+                        <td><input id="merchantSettleInfo" name="merchantSettleInfo" class="validate[required, maxSize[50]]" type="text"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>版本号：</th>
+                        <td><input id="version" name="version" class="validate[required, maxSize[50]]" type="text" value="1.0.0" disabled="disabled"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>回调url：</th>
+                        <td><textarea id="backUrl" name="backUrl" class="validate[required, maxSize[200]]"></textarea></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>返回url：</th>
+                        <td><textarea id="frontUrl" name="frontUrl" class="validate[required, maxSize[200]]"></textarea></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>请求地址：</th>
+                        <td><textarea id="requestAddress" name="requestAddress" class="validate[required, maxSize[200]]"></textarea></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>置单请求地址：</th>
+                        <td><textarea id="zdAddress" name="zdAddress" class="validate[required, maxSize[200]]"></textarea></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>裕福公钥路径：</th>
+                        <td><textarea id="yufucerpPath" name="yufucerpPath" class="validate[required, maxSize[200]]"></textarea></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>裕福私钥路径：</th>
+                        <td><textarea id="yufucerpAddress" name="yufucerpAddress" class="validate[required, maxSize[200]]"></textarea></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>私钥密码：</th>
+                        <td><textarea id="privateSign" name="privateSign" class="validate[required, maxSize[50]]"></textarea></td>
+                    </tr>
+                    </tbody></table>
+            </form>
+        </div>
+    </div>
+    <!--end 内容-->
+</div>
+<!--end 添加弹窗-->
+
+<!--查看弹窗-->
+<div class="PopupBox" id="viewDetails">
+    <!--内容-->
+    <div class="PopupCon">
+        <div class="ph_subPoCon ph_screen">
+            <form id="projectDetails">
+                <table class="ph_tableBox">
+                    <tbody>
+                    <tr>
+                        <th><span class="require">*</span>回调url：</th>
+                        <td><textarea id="viewBackUrl" name="backUrl" class="validate[required]" disabled="disabled"></textarea></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>返回url：</th>
+                        <td><textarea id="viewFrontUrl" name="frontUrl" class="validate[required]" disabled="disabled"></textarea></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>请求地址：</th>
+                        <td><textarea id="viewRequestAddress" name="requestAddress" class="validate[required]" disabled="disabled"></textarea></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>置单请求地址：</th>
+                        <td><textarea id="viewZdAddress" name="zdAddress" class="validate[required]" disabled="disabled"></textarea></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>裕福公钥路径：</th>
+                        <td><textarea id="viewYufucerpPath" name="yufucerpPath" class="validate[required]" disabled="disabled"></textarea></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>裕福私钥路径：</th>
+                        <td><textarea id="viewYufucerpAddress" name="yufucerpAddress" class="validate[required]" disabled="disabled"></textarea></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>私钥密码：</th>
+                        <td><textarea id="viewPrivateSign" name="privateSign" class="validate[required]" disabled="disabled"></textarea></td>
+                    </tr>
+                    </tbody></table>
+            </form>
+        </div>
+    </div>
+    <!--end 内容-->
+</div>
+<!--end 查看弹窗-->
+
+<!--操作框 -->
+<div id="handle">
+</div>
+<!--end 操作框-->
+
+<script type="text/javascript" th:src="@{/js/common/jquery-1.11.1.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/common/index.js}"></script>
+<!--bootstrap-select-->
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/bootstrap-select.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/select.js}"></script>
+<!--分页-->
+<script type="text/javascript" th:src="@{/js/plugins/pages/jquery.dataTables.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/layer/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/spm/spmExtends.js}"></script>
+<!--bootstrap-select-->
+
+<!-- 验证 -->
+<script type="text/javascript" th:src="@{/js/plugins/validat/jquery.validationEngine.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/validat/jquery.validationEngine-zh_CN.js}"></script>
+
+<!--文件树插件-->
+<!--<script type="text/javascript" th:src="@{/static/js/plugins/ztree/jquery-1.4.4.min.js}"></script>-->
+<script type="text/javascript" th:src="@{/js/plugins/ztree/jquery.ztree.core.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/ztree/jquery.ztree.excheck.min.js}"></script>
+<!--上传图片-->
+<script type="text/javascript" th:inline="javascript">
+    var tb;
+    var sessionUser = [[${session.login_back_session}]];
+    $(function () {
+        var Popupe = new PopupBase();
+        Popupe.show('.ph_wareBox', '.Js_btn', '.maskBox,.DeterBox');
+        Popupe.showHide('.subQuemit', '.refundBox,.deliverBox,.menuTreeBox', '.SucBox');
+        Popupe.show('.ph_snbBtn,.ph_wareBox', '.Js_deliver', '.maskBox,.deliverBox');
+        Popupe.show('.ph_wareBox', '.Js_menuTree', '.maskBox,.menuTreeBox');
+        Popupe.hide('.close', '.maskBox,.DeterBox,.SucBox,.deliverBox,.menuTreeBox');
+        tb = $('#example').DataTable({
+            "lengthChange": false,
+            "ordering": false,
+            "searching": false,
+            "bServerSide": true,
+            "autoWidth": false,
+            "sPaginationType": "full_numbers",
+            "bJQueryUI": true,
+            "sDom": '<"">t<"F"ip>',
+            "sAjaxSource": "/configuration/YFConfig/payList", //ajax调用接口===============================调用接口=====================================
+            "aoColumnDefs": [{sDefaultContent: '', aTargets: ['_all']}],
+            "aoColumns": [
+                {"sWidth": "50px", "sTitle": "序号", "mData": "id", "title": "id"},
+                {"sTitle": "商户id", "mData": "merchantId", "class": "sClass"},
+                {"sTitle": "订单金额币种", "mData": "merchantOrderCurrency", "class": "sClass"},
+                {"sTitle": "网关类型", "mData": "gwType", "class": "sClass"},
+                {
+                    "sTitle": "买家类型", "mData": "userType", "class": "sClass", "mRender": function (data, type, full) {
+                        var text;
+                        if (full.userType == '1') {
+                            text = "<font>个人</font>";
+                        } else if (full.userType == '2') {
+                            text = "<font>企业</font>";
+                        }else {
+                            text = "<font>未知</font>";
+                        }
+                        return text;
+                    }
+                },
+                {"sTitle": "商户唯一标识", "mData": "merchantUserId", "class": "sClass"},
+                {"sTitle": "商户结算信息", "mData": "merchantSettleInfo", "class": "sClass"},
+                {"sTitle": "版本号", "mData": "version", "class": "sClass"},
+                {
+                    "sWidth": "110px",
+                    "sTitle": "操作",
+                    "mData": "",
+                    "sClass": "ph_tableShow",
+                    "mRender": function (data, type, full) {
+                        var text = '<div class="ph_operateBox"><input class="ph_operate" name="" type="button" value="操作选项">';
+                        text = text + '<ul class="ph_operateList hide" role="menu">';
+
+                        text += '<li><div class="temp_data" style="display:none">'+ JSON.stringify(full) +'</div><a href="javascript:void(0);" onclick="viewDetails(this)">查看</a></li>';
+
+                        text += '<li><div class="temp_data" style="display:none">'+ JSON.stringify(full) +'</div><a href="javascript:void(0);" onclick="modify(this);">修改</a> </li>';
+                        text = text + '</ul></div>';
+                        return text;
+                    }
+                }
+            ],
+            "oLanguage": {
+                "sProcessing": "数据加载中······",
+                "sLengthMenu": "显示 _MENU_ 条记录",
+                "sZeroRecords": "没有您要搜索的内容！",
+                "sEmptyTable": "列表中无数据存在！",
+                "sInfo": "当前显示 _START_ 到 _END_ 条数据，共 _TOTAL_ 条数据",
+                "sInfoEmpty": "显示 0 到 0 条记录",
+                "sInfoFiltered": "数据列表中共  _MAX_ 条记录",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上一页",
+                    "sNext": "下一页",
+                    "sLast": "末页"
+                }
+            },
+            "fnServerData": function (sSource, aoData, fnCallback, oSettings) {
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "GET",
+                    "async": 'false',
+                    "url": sSource,
+                    "data": {
+                        'pageNum': (aoData[3].value / aoData[4].value) + 1,
+                        'pageSize': aoData[4].value,
+                        'id': $("#id").val(),
+                        'roleName': $("#roleName").val(),
+                        'status': $('#selectStatus').val()
+                    },
+                    "success": fnCallback
+                });
+            },
+            "fnDrawCallback": function () {
+                var api = this.api();
+                var startIndex = api.context[0]._iDisplayStart;//获取到本页开始的条数
+                api.column(0).nodes().each(function (cell, i) {
+                    cell.innerHTML = startIndex + i + 1;
+                });
+
+            }
+        });
+
+
+        $('.ph_snbBtn').on('click', '.Js_deliver', function () {
+            $('#addForm')[0].reset();
+            $("#editId").attr("value","");
+            layer.open({
+                type: 1,
+                title: '裕福配置(支付)添加',
+                closeBtn: 0,
+                area: ['500px', '400px'],
+                btn: ['保存', '取消'],
+                btnAlign: 'c',
+                content: $('#deliverBox'),
+                btn1: function (index) {
+
+                    var flag = $("#addForm").validationEngine("validate");
+                    if (!flag) {
+                        return false;
+                    }
+                    var dataObj = {
+                        version : $("#version").val()
+                    }
+                    var data = $("#addForm").serialize()+'&'+$.param(dataObj);
+
+                    $.ajax({
+//              async       : false,
+                        type: "POST",
+                        url: "/configuration/YFConfig/addPay",
+                        data: data,
+                        success: function (data) {
+                            var d = $.parseJSON(data);
+                            if (d.code == "1") {
+                                layer.alert("保存成功！", {
+                                    icon: 1,
+                                    title: '提示',
+                                    closeBtn: 0,
+                                    btnAlign: 'c'
+                                });
+                                tb.draw();
+                            } else {
+                                layer.alert(d.msg, {
+                                    icon: 2,
+                                    title: '失败',
+                                    closeBtn: 0,
+                                    btnAlign: 'c'
+                                });
+                            }
+                        }
+                    });
+                    $('#addForm')[0].reset();
+                    layer.close(index);
+
+                }
+            });
+        });
+        //验证初始化
+        $('#addForm').validationEngine({
+            promptPosition: 'bottomLeft'
+            , autoPositionUpdate: false
+            , addPromptClass: 'formError-text'
+            , autoHidePrompt: true
+            , autoHideDelay: 3000
+            , fadeDuration: 0.3
+        });
+    });
+
+
+
+    function viewDetails(self) {
+        var temp = $(self).prev(".temp_data").html()
+        var data = JSON.parse(temp);
+        $("#viewBackUrl").val(data.backUrl);
+        $("#viewFrontUrl").val(data.frontUrl);
+        $("#viewRequestAddress").val(data.requestAddress);
+        $("#viewZdAddress").val(data.zdAddress);
+        $("#viewYufucerpPath").val(data.yufucerpPath);
+        $("#viewYufucerpAddress").val(data.yufucerpAddress);
+        $("#viewPrivateSign").val(data.privateSign);
+
+        layer.open({
+            type: 1,
+            title: '裕福配置(支付)查看',
+            closeBtn: 0,
+            area: ['500px', '400px'],
+            btn: ['确定'],
+            btnAlign: 'c',
+            content: $('#viewDetails')
+        });
+    }
+
+
+    function modify(self){
+        var temp = $(self).prev(".temp_data").html()
+        var data = JSON.parse(temp);
+        $("#editId").val(data.id);
+        $("#merchantId").val(data.merchantId);
+        $("#merchantOrderCurrency").val(data.merchantOrderCurrency);
+        $("#gwType").val(data.gwType);
+        $("#backUrl").val(data.backUrl);
+        $("#frontUrl").val(data.frontUrl);
+        if (data.userType == "1"){
+            $("#userType1").prop("checked","checked");
+        } else if (data.userType == "2") {
+            $("#userType2").prop("checked","checked");
+        }
+        $("#merchantUserId").val(data.merchantUserId);
+        $("#merchantSettleInfo").val(data.merchantSettleInfo);
+        $("#requestAddress").val(data.requestAddress);
+        $("#zdAddress").val(data.zdAddress);
+        $("#yufucerpPath").val(data.yufucerpPath);
+        $("#yufucerpAddress").val(data.yufucerpAddress);
+        $("#privateSign").val(data.privateSign);
+        $("#version").val(data.version);
+
+        layer.open({
+            type: 1,
+            title: '裕福配置(支付)修改',
+            closeBtn: 0,
+            area: ['500px', '400px'],
+            btn: ['保存', '取消'],
+            btnAlign: 'c',
+            content: $('#deliverBox'),
+            btn1: function (index) {
+
+                var flag = $("#addForm").validationEngine("validate");
+                if (!flag) {
+                    return false;
+                }
+                var dataObj = {
+                    version : $("#version").val()
+                }
+                var data = $("#addForm").serialize()+'&'+$.param(dataObj);
+                $.ajax({
+//              async       : false,
+                    type: "POST",
+                    url: "/configuration/YFConfig/updatePay",
+                    data: data,
+                    success: function (data) {
+                        var d = $.parseJSON(data);
+                        if (d.code == "1") {
+                            layer.alert("保存成功！", {
+                                icon: 1,
+                                title: '提示',
+                                closeBtn: 0,
+                                btnAlign: 'c'
+                            });
+                            tb.draw(false);
+                        } else {
+                            layer.alert(d.msg, {
+                                icon: 2,
+                                title: '失败',
+                                closeBtn: 0,
+                                btnAlign: 'c'
+                            });
+                        }
+                    }
+                });
+                $('#addForm')[0].reset();
+                layer.close(index);
+            },
+            btn2: function (index) {
+                $("#userType2").prop("checked",false);
+                $("#userType1").prop("checked","checked");
+            }
+        });
+    }
+    $("#example").on("mouseenter",".ph_tableShow",function(){
+        $(this).attr("title","")
+    });
+
+    // 原生写法
+    // js 实现匹配空格删除
+    var mer_url = document.getElementsByTagName('input');
+    for (var i = 0; i < mer_url.length; i++) {
+        mer_url[i].onblur = function() {
+            this.value = Trim(this.value);
+        };
+    }
+
+    // 监测空格函数 如果有空格替换成空
+    function Trim(str) {
+        return str.replace(/\s*/g,"");
+    }
+    // js 实现匹配空格删除
+    var text_url = document.getElementsByTagName('textarea');
+    for (var i = 0; i < text_url.length; i++) {
+        text_url[i].onblur = function() {
+            this.value = Trim(this.value);
+        };
+    }
+</script>
+</body>
+</html>

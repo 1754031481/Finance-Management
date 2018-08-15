@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.ldconfig.LDPayMapper">
+
+   <!-- 获取列表数据 -->
+    <select id="getLdPayList" resultType="com.zc.entity.ldconfig.LDPayConfig">
+        select
+        id,
+        `name`,
+        app_id as appId,
+        test_secret as testSecret,
+        app_secret as appSecret,
+        master_secret as masterSecret,
+        channel,
+        bc_gateway_return_url as bcGatewayReturnUrl,
+        notify_url as notifyUrl
+        from ldys_pay_config
+        order by created_time desc
+    </select>
+
+    <!--回显-->
+    <select id="getLdPayById" parameterType="java.lang.Long" resultType="com.zc.entity.ldconfig.LDPayConfig">
+        select
+        id,
+        `name`,
+        app_id as appId,
+        test_secret as testSecret,
+        app_secret as appSecret,
+        master_secret as masterSecret,
+        channel,
+        bc_gateway_return_url as bcGatewayReturnUrl,
+        notify_url as notifyUrl
+        from ldys_pay_config
+        where id=#{id}
+        limit 1
+    </select>
+
+    <update id="updateLdPay" parameterType="com.zc.entity.ldconfig.LDPayConfig">
+        update ldys_pay_config
+        set
+        `name`=#{name},
+        app_id=#{appId},
+        test_secret=#{testSecret},
+        app_secret=#{appSecret},
+        master_secret=#{masterSecret},
+        channel=#{channel},
+        bc_gateway_return_url=#{bcGatewayReturnUrl},
+        notify_url=#{notifyUrl},
+        update_time=now()
+        where id=#{id}
+    </update>
+
+</mapper>

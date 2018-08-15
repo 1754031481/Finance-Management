@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.paycontext.PayContextMapper">
+
+
+    <sql id="baseSelect">
+        SELECT
+        id,
+        DATE_FORMAT(created_time,'%Y-%m-%d %H:%i:%s') created_time,
+        DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%s') update_time,
+        current_describe,
+        current_return_msg,
+        from_system,
+        is_push_success,
+       convert(money,decimal)/100 money,
+        order_num,
+        pay_status,
+        send_context,
+        syn_return_context,
+        system_role,
+        third_pay_type,
+        versionid,
+        type,
+        is_delay,
+        ayn_url
+    </sql>
+
+    <select id="getPayContextWhyOrderNum"  resultType="com.zc.entity.paycontext.PayContext">
+
+     SELECT  id,
+        current_describe currentDescribe,
+        current_return_msg currentReturnMsg,
+        from_system fromSystem,
+        is_push_success isPushSuccess,
+        money,
+        order_num orderNum,
+        pay_status payStatus,
+        send_context sendContext,
+        syn_return_context synReturnContext,
+        system_role systemRole,
+        third_pay_type thirdPayType,
+        versionid,
+        type,
+        is_delay isDelay,
+        ayn_url aynUrl
+         from pay_context WHERE order_num = #{merSeqId}
+    </select>
+
+    <select id="findOrderList" resultType="Map">
+        <include refid="baseSelect"/> from pay_context
+        <where>
+            created_time between (SELECT DATE_ADD(now(),INTERVAL -1 MONTH)) and now()
+            <if test="orderNum != null">
+                and  order_num = #{orderNum}
+            </if>
+            <if test="thirdPayType != null">
+                and third_pay_type = #{thirdPayType}
+            </if>
+            <if test="createdTime != null">
+                and created_time &gt;= #{createdTime}
+            </if>
+            <if test="updateTime != null">
+                and created_time &lt;= #{updateTime}
+            </if>
+            <if test="payStatus != null">
+                and pay_status = #{payStatus}
+            </if>
+            <if test="fromSystem != null">
+                and from_system = #{fromSystem}
+            </if>
+        </where>
+        ORDER BY created_time DESC
+    </select>
+
+    <select id="projectShunteDataShow" resultType="Map">
+        SELECT SUM(money/100) money,COUNT(1) count,third_pay_type thirdPayType FROM pay_context WHERE TYPE=1 AND created_time LIKE  '%${date}%' AND from_system  = #{systemFromName}
+        GROUP BY third_pay_type
+    </select>
+
+    <select id="getChannelSel" resultType="java.lang.String">
+        select `name` from interface_entity
+    </select>
+
+    <select id="findSelectId" resultType="java.lang.String">
+         select id from pay_context
+        <where>
+            created_time between (SELECT DATE_ADD(now(),INTERVAL -1 MONTH)) and now()
+            <if test="orderNum != null">
+                and  order_num = #{orderNum}
+            </if>
+            <if test="thirdPayType != null">
+                and third_pay_type = #{thirdPayType}
+            </if>
+            <if test="createdTime != null">
+                and created_time &gt;= #{createdTime}
+            </if>
+            <if test="updateTime != null">
+                and created_time &lt;= #{updateTime}
+            </if>
+            <if test="payStatus != null">
+                and pay_status = #{payStatus}
+            </if>
+            <if test="fromSystem != null">
+                and from_system = #{fromSystem}
+            </if>
+        </where>
+        ORDER BY created_time DESC
+    </select>
+
+    <select id="getPayContextByIds" resultType="com.zc.entity.paycontext.PayContext" >
+        SELECT
+        DATE_FORMAT(created_time,'%Y-%m-%d %H:%i:%s') as createdTime,
+        order_num as orderNum,
+        third_pay_type as thirdPayType,
+        money,
+        pay_status as payStatus
+        FROM pay_context
+        where id in
+        <foreach collection="ids"  item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+
+</mapper>

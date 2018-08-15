@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="UTF-8">
+    <title>测试订单</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common/models.css}">
+    <!--bootstrap-select  css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/bootstrapselect/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/bootstrapselect/css/bootstrap-select.css}"/>
+    <!--文件树插件 css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/ztree/zTreeStyle.css}">
+    <!--日期  css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/datepicker/css/bootstrap-datepicker.css}">
+    <style>
+    </style>
+
+</head>
+<body>
+<div class="MainContent">
+    <!--面包屑-->
+    <div class="current">当前位置：<a href="#">测试专用</a>&nbsp;&gt;&nbsp;<span>测试订单</span></div>
+    <!--end 面包屑-->
+    <!--主体内容-->
+    <div class="MainCont">
+        <!--标题-->
+
+        <div class="ph_subTit">
+            <h2>测试订单列表</h2>
+            <div class="ph_snbBtn">
+                <input class="Js_deliver" name="" type="button" value="操作日志">
+            </div>
+        </div>
+
+        <!--end 标题-->
+        <!--专题列表-->
+        <div class="ph_wareBox" id="tableArea" >
+            <table class="ph_wareList" id="example"></table>
+        </div>
+        <!--end 专题列表-->
+    </div>
+    <!--end 主体内容-->
+</div>
+
+
+<!--修改测试订单弹窗-->
+<div class="PopupBox" id="deliverBox">
+    <!--内容-->
+    <div class="PopupCon">
+        <div class="ph_subPoCon ph_screen">
+            <form id="addForm">
+                <table class="ph_tableBox">
+                    <input id="editId" name="id" type="hidden">
+                    <tbody><tr>
+                        <th><span class="require">*</span>订单号：</th>
+                        <td><input id="merSeqId" class="validate[required, maxSize[50]]" name="merSeqId" type="text" disabled="disabled">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>订单时间：</th>
+                        <td><input type="text" id="createTimeStr" name="createTimeStr"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>发起银行卡：</th>
+                        <td><select id="cardNo" name="cardNo" class="validate[required]"></select></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>提现账户姓名：</th>
+                        <td><input id="personName" name="personName" class="validate[required], maxSize[200]]" type="text"></td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>银行名称：</th>
+                        <td><input id="bankName" class="validate[required, maxSize[50]]" name="bankName" type="text">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>提现身份证号：</th>
+                        <td><input id="comments" class="validate[required, maxSize[50]]" name="comments" type="text">
+                            </input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><span class="require">*</span>三方渠道：</th>
+                        <td><select id="thirdPayType" class="validate[required]" name="thirdPayType">
+                            </select>
+                        </td>
+                    </tr>
+                    </tbody></table>
+            </form>
+        </div>
+    </div>
+    <!--end 内容-->
+</div>
+<!--end 添加中信扫码配置弹窗-->
+
+<!--查看弹窗-->
+<div class="PopupBox" id="viewDetails">
+    <!--内容-->
+    <div class="PopupCon">
+        <div class="ph_subPoCon ph_screen">
+            <form id="projectDetails">
+                <table class="ph_tableBox">
+                    <tbody>
+                    </tbody></table>
+            </form>
+        </div>
+    </div>
+    <!--end 内容-->
+</div>
+<!--end 查看弹窗-->
+
+<!--操作框 -->
+<div id="handle">
+</div>
+<!--end 操作框-->
+
+<script type="text/javascript" th:src="@{/js/common/jquery-1.11.1.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/common/index.js}"></script>
+<!--bootstrap-select-->
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/bootstrap-select.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/bootstrapselect/select.js}"></script>
+<!--分页-->
+<script type="text/javascript" th:src="@{/js/plugins/pages/jquery.dataTables.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/layer/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/spm/spmExtends.js}"></script>
+<!--bootstrap-select-->
+
+<!-- 验证 -->
+<script type="text/javascript" th:src="@{/js/plugins/validat/jquery.validationEngine.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/validat/jquery.validationEngine-zh_CN.js}"></script>
+
+<!--文件树插件-->
+<!--<script type="text/javascript" th:src="@{/static/js/plugins/ztree/jquery-1.4.4.min.js}"></script>-->
+<script type="text/javascript" th:src="@{/js/plugins/ztree/jquery.ztree.core.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/ztree/jquery.ztree.excheck.min.js}"></script>
+
+<!--日期控件-->
+<script type="text/javascript" th:src="@{/js/plugins/datepicker/bootstrap-datepicker.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/datepicker/jquery.timepicker.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/datepicker/jquery.datepair.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/datepicker/datepicker.js}"></script>
+<!--上传图片-->
+
+<script type="text/javascript" th:src="@{/laydate/laydate.js}"></script>
+
+<script type="text/javascript" th:inline="javascript">
+    var tb;
+    var sessionUser = [[${session.login_back_session}]];
+    Date.prototype.Format = function(fmt) {//author: meizz
+        var o = {
+            "M+" : this.getMonth() + 1, //月份
+            "d+" : this.getDate(), //日
+            "h+" : this.getHours(), //小时
+            "m+" : this.getMinutes(), //分
+            "s+" : this.getSeconds(), //秒
+            "q+" : Math.floor((this.getMonth() + 3) / 3), //季度
+            "S" : this.getMilliseconds() //毫秒
+        };
+        if (/(y+)/.test(fmt))
+            fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (var k in o)
+            if (new RegExp("(" + k + ")").test(fmt))
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+        return fmt;
+    }
+    $(function () {
+
+        $.ajax({
+            url : '/aboutTesting/testOrder/getBankNumAndChannelList',
+            type : 'GET',
+            success : function (data) {
+                var d = $.parseJSON(data);
+                var bankNums = d.bankNums;
+                var channels = d.channels;
+                var cardNoStr = '<select id="cardNo" name="cardNo" class="validate[required]"><option value="">=======请选择======</option>';
+                var thirdPayTypeStr = '<select id="thirdPayType" name="thirdPayType" class="validate[required]"><option value="">=======请选择======</option>';
+                $.each(bankNums,function (i ,n) {
+                    cardNoStr += '<option value="'+ n +'" id="'+n+'">' + n + '</option>';
+                });
+
+                $.each(channels,function (i ,n) {
+                    thirdPayTypeStr += '<option value="'+ n +'" id="'+n+'">'+ n + '</option>';
+                });
+                cardNoStr += '</select>';
+                thirdPayTypeStr += '</select>';
+                $('.selectpicker').selectpicker('refresh');
+                $("#cardNo").html(cardNoStr);
+                $("#thirdPayType").html(thirdPayTypeStr);
+            }
+        });
+
+        var Popupe = new PopupBase();
+        Popupe.show('.ph_wareBox', '.Js_btn', '.maskBox,.DeterBox');
+        Popupe.showHide('.subQuemit', '.refundBox,.deliverBox,.menuTreeBox', '.SucBox');
+        Popupe.show('.ph_snbBtn,.ph_wareBox', '.Js_deliver', '.maskBox,.deliverBox');
+        Popupe.show('.ph_wareBox', '.Js_menuTree', '.maskBox,.menuTreeBox');
+        Popupe.hide('.close', '.maskBox,.DeterBox,.SucBox,.deliverBox,.menuTreeBox');
+        tb = $('#example').DataTable({
+            "lengthChange": false,
+            "ordering": false,
+            "scrollX": false,
+            "paging": true,
+            "searching": false,
+            "bServerSide": true,
+            "autoWidth": false,
+            "sPaginationType": "full_numbers",
+            "bJQueryUI": true,
+            "sDom": '<"">t<"F"ip>',
+            "sAjaxSource": "/aboutTesting/testOrder/TestOrderList", //ajax调用接口===============================调用接口=====================================
+            "aoColumnDefs": [{sDefaultContent: '', aTargets: ['_all']}],
+            "aoColumns": [
+                {
+                    "sWidth": "50px",
+                    "sTitle": "<input type=\"checkbox\" onclick=\"checkAll(this)\" id=\"checkAll\">",
+                    "mData": "",
+                    "sClass": "ph_tableShow",
+                    "mRender": function (data, type, full) {
+                        text = "<input type=\"checkbox\">";
+                        return text;
+                    }
+                },
+                {"sWidth": "50px", "sTitle": "序号", "mData": "", "title": ""},
+                {"sTitle": "订单号", "mData": "merSeqId", "class": "sClass"},
+                {
+                    "sWidth": "160px",
+                    "sTitle": "订单创建时间",
+                    "mData": "",
+                    "sClass": "ph_tableShow",
+                    "mRender": function (data, type, full) {
+                        var date = new Date(parseInt(full.createdTime)).Format("yyyy-MM-dd hh:mm:ss");
+                        text = "<font>"+ date +"</font>";
+                        return text;
+                    }
+                },
+                {"sTitle": "发起银行卡", "mData": "cardNo", "class": "sClass"},
+                {"sWidth": "90px","sTitle": "提现账户姓名", "mData": "personName", "class": "sClass"},
+                {"sWidth": "100px","sTitle": "银行名称", "mData": "bankName", "class": "sClass"},
+                {"sWidth": "180px","sTitle": "提取账户身份证号", "mData": "comments", "class": "sClass"},
+                {"sWidth": "135px","sTitle": "三方渠道", "mData": "thirdPayType", "class": "sClass"},
+                {
+                    "sWidth": "90px",
+                    "sTitle": "交易金额",
+                    "mData": "",
+                    "sClass": "ph_tableShow",
+                    "mRender": function (data, type, full) {
+
+                        text = "<font>"+parseFloat(full.money / 100).toFixed(2)+"</font>";
+                        return text;
+                    }
+                },
+                {
+                    "sWidth": "70px",
+                    "sTitle": "订单状态",
+                    "mData": "",
+                    "sClass": "ph_tableShow",
+                    "mRender": function (data, type, full) {
+                        var text;
+                        if (full.status == '1') {
+                            text = "<font>待发起</font>";
+                        } else if (full.status == '3') {
+                            text = "<font>失败</font>";
+                        }else if (full.status == '4') {
+                            text = "<font>处理中</font>";
+                        }else{
+                            text = "<font>未知</font>";
+                        }
+                        return text;
+                    }
+                },
+                {
+                    "sWidth": "100px",
+                    "sTitle": "操作",
+                    "mData": "",
+                    "sClass": "ph_tableShow",
+                    "mRender": function (data, type, full) {
+                        var text = '<div class="ph_operateBox"><input class="ph_operate" name="" type="button" value="操作选项">';
+                        text = text + '<ul class="ph_operateList hide" role="menu">';
+                        text += '<li><div class="temp_data" style="display:none">'+ JSON.stringify(full) +'</div><a href="javascript:void(0);" onclick="modify(this);">修改</a> </li>';
+                        text = text + '</ul></div>';
+                        return text;
+                    }
+                }
+            ],
+            "oLanguage": {
+                "sProcessing": "数据加载中······",
+                "sLengthMenu": "显示 _MENU_ 条记录",
+                "sZeroRecords": "没有您要搜索的内容！",
+                "sEmptyTable": "列表中无数据存在！",
+                "sInfo": "当前显示 _START_ 到 _END_ 条数据，共 _TOTAL_ 条数据",
+                "sInfoEmpty": "显示 0 到 0 条记录",
+                "sInfoFiltered": "数据列表中共  _MAX_ 条记录",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上一页",
+                    "sNext": "下一页",
+                    "sLast": "末页"
+                }
+            },
+            "fnServerData": function (sSource, aoData, fnCallback, oSettings) {
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "GET",
+                    "async": 'false',
+                    "url": sSource,
+                    "data": {
+                        'pageNum': (aoData[3].value / aoData[4].value) + 1,
+                        'pageSize': aoData[4].value,
+                        'id': $("#id").val(),
+                        'roleName': $("#roleName").val(),
+                        'status': $('#selectStatus').val()
+                    },
+                    "success": fnCallback
+                });
+
+                $("#checkAll").removeProp("checked");
+            },
+            "fnDrawCallback": function () {
+                var api = this.api();
+                var startIndex = api.context[0]._iDisplayStart;//获取到本页开始的条数
+                api.column(1).nodes().each(function (cell, i) {
+                    cell.innerHTML = startIndex + i + 1;
+                });
+
+            }
+        });
+
+
+        $('.ph_snbBtn').on('click', '.Js_deliver', function () {
+            window.location.href = "/aboutTesting/testOrder/gotoTestOrderLogs";
+        });
+        //验证初始化
+        $('#addForm').validationEngine({
+            promptPosition: 'bottomLeft'
+            , autoPositionUpdate: false
+            , addPromptClass: 'formError-text'
+            , autoHidePrompt: true
+            , autoHideDelay: 3000
+            , fadeDuration: 0.3
+        });
+    });
+
+
+
+
+    function modify(self){
+        var temp = $(self).prev(".temp_data").html()
+        var data = JSON.parse(temp);
+        $("#editId").val(data.id)
+        $("#merSeqId").val(data.merSeqId);
+        var date = new Date(parseInt(data.createdTime)).Format("yyyy-MM-dd hh:mm:ss")
+        $("#createTimeStr").val(date);
+        $("#"+data.cardNo).prop("selected", true);
+        $("#personName").val(data.personName);
+        $("#bankName").val(data.bankName);
+        $("#comments").val(data.comments);
+        $("#"+data.thirdPayType).prop("selected", true);
+
+
+        layer.open({
+            type: 1,
+            title: '测试订单修改',
+            closeBtn: 0,
+            area: ['500px', '400px'],
+            btn: ['保存', '取消'],
+            btnAlign: 'c',
+            content: $('#deliverBox'),
+            btn1: function (index) {
+
+                var flag = $("#addForm").validationEngine("validate");
+                if (!flag) {
+                    return false;
+                }
+                $.ajax({
+//              async       : false,
+                    type: "POST",
+                    url: "/aboutTesting/testOrder/updateTestOrder",
+                    data: {
+                        createTimeStr: $("#createTimeStr").val(),
+                        merSeqId : $("#merSeqId").val(),
+                        cardNo : $("#cardNo").val(),
+                        personName : $("#personName").val(),
+                        bankName : $("#bankName").val(),
+                        comments : $("#comments").val(),
+                        thirdPayType : $("#thirdPayType").val()
+                    },
+                    success: function (data) {
+                        var d = $.parseJSON(data);
+                        if (d.code == "1") {
+                            layer.alert("保存成功！", {
+                                icon: 1,
+                                title: '提示',
+                                closeBtn: 0,
+                                btnAlign: 'c'
+                            });
+                            tb.draw(false);
+                        } else {
+                            layer.alert(d.msg, {
+                                icon: 2,
+                                title: '失败',
+                                closeBtn: 0,
+                                btnAlign: 'c'
+                            });
+                        }
+                    }
+                });
+                $('#addForm')[0].reset();
+                layer.close(index);
+            }
+        });
+    }
+    $("#example").on("mouseenter",".ph_tableShow",function(){
+        $(this).attr("title","")
+    });
+
+    // 原生写法
+    // js 实现匹配空格删除
+    var mer_url = document.getElementsByTagName('input');
+    for (var i = 0; i < mer_url.length; i++) {
+        mer_url[i].onblur = function() {
+            this.value = Trim(this.value);
+        };
+    }
+
+    // 监测空格函数 如果有空格替换成空
+    function Trim(str) {
+        return str.replace(/\s*/g,"");
+    }
+
+    function checkAll(obj) {
+        $("input").prop("checked",obj.checked);
+    }
+
+    laydate.render({
+        elem: '#createTimeStr'
+        ,type: 'datetime'
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.todaydispose.TodayDisposeContextMapper">
+
+
+    <sql id="baseSelect">
+        SELECT
+        id,
+        DATE_FORMAT(created_time,'%Y-%m-%d %H:%i:%s') created_time,
+        DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%s') update_time,
+        current_describe,
+        from_system,
+        is_push_success,
+        convert(money,decimal)/100 money,
+        order_num,
+        pay_status,
+        syn_return_context,
+        system_role,
+        third_pay_type,
+        versionid,
+        type,
+        is_delay,
+        ayn_url
+    </sql>
+
+    <select id="getPayContextWhyOrderNum"  resultType="com.zc.entity.paycontext.PayContext">
+
+     SELECT  id,
+        current_describe currentDescribe,
+        current_return_msg currentReturnMsg,
+        from_system fromSystem,
+        is_push_success isPushSuccess,
+        money,
+        order_num orderNum,
+        pay_status payStatus,
+        syn_return_context synReturnContext,
+        system_role systemRole,
+        third_pay_type thirdPayType,
+        versionid,
+        type,
+        is_delay isDelay,
+        ayn_url aynUrl
+         from pay_context WHERE order_num = #{merSeqId}
+    </select>
+
+    <select id="findOrderList" resultType="Map">
+        <include refid="baseSelect"/> from pay_context
+        <where>
+            created_time >= CURRENT_DATE() AND pay_status = 1
+            <if test="orderNum != null">
+                and  order_num = #{orderNum}
+            </if>
+            <if test="thirdPayType != null">
+                and third_pay_type = #{thirdPayType}
+            </if>
+            <if test="createdTime != null">
+                and created_time &gt;= #{createdTime}
+            </if>
+            <if test="updateTime != null">
+                and update_time &lt;= #{updateTime}
+            </if>
+            <if test="fromSystem != null">
+                and from_system = #{fromSystem}
+            </if>
+            <if test="type != null">
+                and type = #{type}
+            </if>
+        </where>
+        ORDER BY created_time DESC
+    </select>
+    <select id="selectId" resultType="java.lang.String">
+        <include refid="baseSelect"/> from pay_context
+        <where>
+            created_time >= CURRENT_DATE() AND pay_status = 1
+            <if test="orderNum != null">
+                and  order_num = #{orderNum}
+            </if>
+            <if test="thirdPayType != null">
+                and third_pay_type = #{thirdPayType}
+            </if>
+            <if test="createdTime != null">
+                and created_time &gt;= #{createdTime}
+            </if>
+            <if test="updateTime != null">
+                and update_time &lt;= #{updateTime}
+            </if>
+            <if test="fromSystem != null">
+                and from_system = #{fromSystem}
+            </if>
+            <if test="type != null">
+                and type = #{type}
+            </if>
+        </where>
+        ORDER BY created_time DESC
+    </select>
+
+    <!-- 查询下拉框-->
+    <select id="getSelectOrder" resultType="com.zc.entity.paycontext.PayContext">
+        SELECT  distinct  id, from_system AS fromSystem,`third_pay_type` AS thirdPayType
+        FROM `pay_context`
+        ORDER BY created_time DESC
+    </select>
+
+
+    <!--根据id列表批量查询-->
+    <select id="getBatchQuery" resultType="com.zc.entity.paycontext.PayContext">
+        SELECT
+        pay_context.id AS id,
+        pay_context.ayn_url AS aynUrl,
+        pay_context.batch_no AS batchNo,
+        pay_context.created_ip AS createdIp,
+        pay_context.created_time AS createdTime ,
+        pay_context.current_describe AS currentDescribe,
+        pay_context.current_return_msg AS currentReturnMsg,
+        pay_context.from_system AS fromSystem,
+        pay_context.is_push_success AS isPushSuccess,
+        pay_context.money AS money,
+        pay_context.order_num AS orderNum,
+        pay_context.pay_status AS payStatus,
+        pay_context.send_context AS sendContext,
+        pay_context.syn_return_context AS synReturnContext,
+        pay_context.system_role AS systemRole,
+        pay_context.third_pay_type AS thirdPayType,
+        pay_context.update_time AS updateTime,
+        pay_context.versionid AS versionID,
+        pay_context.type AS type,
+        pay_context.is_delay AS isDelay
+        FROM
+        pay_context
+        WHERE id in
+        <foreach collection="dramaIds" item="dramaId" open="(" close=")" separator=",">
+            #{dramaId}
+        </foreach>
+    </select>
+    <!--批量添加-->
+    <insert id="putBatch" >
+        INSERT INTO  timing_task (
+        created_ip,	 created_time,
+        update_time, ayn_url,
+        batch_no,	 descibe,
+        money,	     order_num,
+        pay_status,
+        pay_type,    system_from_name,
+        system_name, third_pay_type
+        )
+        VALUES
+        <foreach collection ="payContextListk" item="list" separator =",">
+            (#{list.createdIp}, #{list.createdTime},
+            #{list.updateTime},#{list.aynUrl},
+            #{list.batchNo},#{list.currentDescribe},
+            #{list.money},   #{list.orderNum},
+            #{list.payStatus},
+            #{list.type},#{list.fromSystem},
+            #{list.fromSystem},#{list.thirdPayType})
+        </foreach >
+
+    </insert>
+
+    <select id="getChannelSel" resultType="java.lang.String">
+        select `name` from interface_entity
+    </select>
+</mapper>

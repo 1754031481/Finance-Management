@@ -1,0 +1,76 @@
+
+
+
+table tr th:nth-child(2){
+	width:7%;
+}
+table tr th:nth-child(3){
+	width:7%;
+}
+table tr th:nth-child(4){
+	width:15%;
+}
+
+.biao_qian{
+	width:5%;
+	overflow: hidden;
+}
+.biao_qian span{
+	display: inline-block;
+	width: 51%;
+	height:22px;
+	float:center;
+	line-height:22px;
+}
+.biao_qian span:nth-child(2){
+	box-sizing: border-box;
+	border-radius:10px;
+	border:2px solid #1abc9c;
+	background:#1abc9c;
+}
+.biao_qian span:nth-child(2) i{
+	display: inline-block;
+	width:60%;
+	height:100%;
+	border-radius:50%;
+	background:#fff;
+	float:left;
+}
+.box .biao_qian .ff_left{
+	border:2px solid #797979;
+	background:#797979;
+}
+.box  .biao_qian .ff_left i{
+	float:right;
+}
+/*商品评价*/
+.box3 .come_type span{
+	display: inline-block;
+	width:15px;
+	height:15px;
+	/*background:#d00;*/
+	margin:0;
+	background:url(/images/xin2.png) no-repeat center center;
+}
+.box3 .come_type .select{
+	background:url(/images/xin1.png) no-repeat center center;
+}
+.box3 .biao_qian span{
+	box-sizing: border-box;
+    border-radius: 10px;
+    border: 2px solid #1abc9c;
+    background: #1abc9c;
+    /*width:50%;*/
+    /*display: inline-block;*/
+    /*height: 20px;*/
+    float: none;
+}
+.box3 .biao_qian span i{
+	display: inline-block;
+	width:50%;
+	height:100%;
+	border-radius:50%;
+	background:#fff;
+	float:left;
+}
+

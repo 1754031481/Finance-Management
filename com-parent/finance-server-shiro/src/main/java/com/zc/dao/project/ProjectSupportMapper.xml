@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.project.ProjectSupportMapper">
+
+    <!--获取支持项目列表-->
+    <select id="getProjectSupportlist" resultType="com.zc.vo.project.ProjectSupportVO">
+        SELECT id, `name` AS projectName, system_from_name AS projectSign,
+        third_pay_type_pay AS payInterface, third_pay_type_cash AS cashInterface,
+        system_from_ayn_url AS systemFromUrl, support_statue AS supportStatue,
+        is_shunting_pay AS shuntingPay, is_shunting_cash AS shuntingCash
+        FROM system_from
+        ORDER BY created_time DESC
+    </select>
+
+    <insert id="addProjectSupport" parameterType="com.zc.vo.project.ProjectSupportVO">
+        INSERT INTO system_from (
+            created_time,
+            update_time,
+            NAME,
+            system_from_name,
+            third_pay_type_pay,
+            third_pay_type_cash,
+            system_from_ayn_url,
+            support_statue,
+            is_shunting_pay,
+            is_shunting_cash
+        )VALUES(
+                NOW(),
+                NOW(),
+                #{projectName},
+                #{projectSign},
+                #{payInterface},
+                #{cashInterface},
+                #{systemFromUrl},
+                #{supportStatue},
+                #{shuntingPay},
+                #{shuntingCash}
+        )
+    </insert>
+
+    <update id="updateProjectSupport" parameterType="com.zc.vo.project.ProjectSupportVO">
+        UPDATE system_from
+        SET update_time = NOW(),name=#{projectName},system_from_name=#{projectSign},third_pay_type_pay=#{payInterface},third_pay_type_cash=#{cashInterface},
+        system_from_ayn_url=#{systemFromUrl},support_statue=#{supportStatue},is_shunting_pay=#{shuntingPay},is_shunting_cash=#{shuntingCash}
+        WHERE id = #{id}
+    </update>
+
+    <!--获取支付接口列表-->
+    <select id="getPayInterface" resultType="java.lang.String">
+        SELECT name
+        FROM `interface_entity`
+        WHERE type = 0
+    </select>
+
+    <!--获取代付接口列表-->
+    <select id="getCashInterface" resultType="java.lang.String">
+        SELECT name
+        FROM `interface_entity`
+        WHERE type = 1
+    </select>
+</mapper>

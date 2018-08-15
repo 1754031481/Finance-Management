@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.commonpay.CommonPayMapper">
+
+   <!-- 获取列表数据 -->
+    <select id="getCommonPayList" resultType="com.zc.entity.finance.CommonPayConfig">
+        select `id`,
+        ROUND(single_a_limit/100,0) as singleLimit,
+        ROUND(single_day_limit/100,0) as singleDayLimit,
+        `start_time` as startTime,
+        `stop_time` as stopTime,
+        `weekend`,
+        `name`,
+        ROUND(single_max_limit/100,0) as singleMaxLimit,
+        ROUND(single_min_limit/100,0) as singleMinLimit,
+        `ayn_url` as aynUrl,
+        `enable_time_validate` as enableTimeValidate,
+        `ayn_url2` as aynUrl2,
+        `is_delayed` as isDelayed
+        from common_pay_config
+        order by created_time desc
+    </select>
+
+    <!--回显-->
+    <select id="getCommonPayById" parameterType="java.lang.Long" resultType="com.zc.entity.finance.CommonPayConfig">
+        select `id`,
+        ROUND(single_a_limit/100,0) as singleLimit,
+        ROUND(single_day_limit/100,0) as singleDayLimit,
+        `start_time` as startTime,
+        `stop_time` as stopTime,
+        `weekend`,
+        `name`,
+        ROUND(single_max_limit/100,0) as singleMaxLimit,
+        ROUND(single_min_limit/100,0) as singleMinLimit,
+        `ayn_url` as aynUrl,
+        `enable_time_validate` as enableTimeValidate,
+        `ayn_url2` as aynUrl2,
+        `is_delayed` as isDelayed
+        from common_pay_config
+        where id=#{id}
+        limit 1
+    </select>
+
+    <!--修改信息-->
+    <update id="updateCommonPay" parameterType="com.zc.entity.finance.CommonPayConfig">
+        update common_pay_config
+        set
+        single_a_limit=#{singleLimit}*100,
+        single_day_limit=#{singleDayLimit}*100,
+        start_time=#{startTime},
+        stop_time=#{stopTime},
+        weekend=#{weekend},
+        `name`=#{name},
+        single_max_limit=#{singleMaxLimit}*100,
+        single_min_limit=#{singleMinLimit}*100,
+        ayn_url=#{aynUrl},
+        ayn_url2=#{aynUrl2},
+        is_delayed=#{isDelayed},
+        enable_time_validate=#{enableTimeValidate},
+        update_time=now()
+        where id=#{id}
+    </update>
+
+<insert id="insertCommonPay" parameterType="com.zc.entity.finance.CommonPayConfig">
+    insert into common_pay_config
+        (single_a_limit,
+        single_day_limit,
+        start_time,
+        stop_time,
+        weekend,
+        `name`,
+        single_max_limit,
+        single_min_limit,
+        ayn_url,
+        ayn_url2,
+        is_delayed,
+        enable_time_validate,
+        created_time,
+        update_time)
+        values(
+        #{singleLimit}*100,
+        #{singleDayLimit}*100,
+        #{startTime},
+        #{stopTime},
+        #{weekend},
+        #{name},
+        #{singleMaxLimit}*100,
+        #{singleMinLimit}*100,
+        #{aynUrl},
+        #{aynUrl2},
+        #{isDelayed},
+        #{enableTimeValidate},
+        now(),
+        now()
+        )
+</insert>
+</mapper>

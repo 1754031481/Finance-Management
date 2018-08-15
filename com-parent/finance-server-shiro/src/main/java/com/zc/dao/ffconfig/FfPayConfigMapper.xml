@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zc.dao.ffconfig.FfPayConfigMapper">
+
+    <sql id="baseSelect">
+		SELECT
+		id,
+		bank_url,
+       gate_id,
+       key_check,
+       liq_type,
+       mer_id,
+       req_type,
+       req_url,
+       ret_url,
+       name,
+       user_id,
+       root_url,
+       created_time,
+       update_time
+	</sql>
+
+    <!--SELECT
+       gate_id gateId ,
+       key_check keyCheck,
+       liq_type liqType,
+       mer_id merId,
+       name name ,
+       req_type reqType,
+       req_url reqUrl,
+       ret_url retUrl,
+       root_url rootUrl,
+       user_id userId,
+       bank_url bankUrl -->
+
+    <select id="findFfPayConfig" resultType="map" >
+        <include refid="baseSelect"/>  FROM ff_pay_config   ORDER BY created_time DESC
+    </select>
+
+    <select id="findConfig" resultType="Map">
+       SELECT id,req_type,req_url,ret_url,root_url,key_check FROM ff_pay_config  WHERE  id = #{ffPayId}
+    </select>
+
+
+    <update id="updateFfPayConfig" parameterType="com.zc.entity.ffconfig.FFPayConfig">
+       UPDATE ff_pay_config
+        <set>
+            <if test="name != null">name=#{name},</if>
+            <if test="gateId != null">gate_id=#{gateId},</if>
+            <if test="merId != null">mer_id=#{merId},</if>
+            <if test="liqType != null">liq_type=#{liqType},</if>
+            <if test="reqUrl != null">req_url=#{reqUrl},</if>
+            <if test="userId != null">user_id=#{userId},</if>
+            <if test="reqType != null">req_type=#{reqType},</if>
+            <if test="rootUrl != null">root_url=#{rootUrl},</if>
+            <if test="keyCheck != null">key_check=#{keyCheck},</if>
+            <if test="bankUrl != null">bank_url=#{bankUrl},</if>
+            <if test="retUrl != null">ret_url=#{retUrl}</if>
+        </set>
+        WHERE   id = #{id}
+    </update>
+    
+    <insert id="addFfPayConfig"  parameterType="com.zc.entity.ffconfig.FFPayConfig"  >
+        INSERT INTO ff_pay_config ( `created_time`, `update_time`, `gate_id`, `key_check`, `liq_type`, `mer_id`, `name`, `req_type`, `req_url`, `ret_url`, `root_url`, `user_id`, `bank_url`)
+        VALUES (#{createdTime},#{updateTime},#{gateId},#{keyCheck},#{liqType},#{merId},#{name},#{reqType},#{reqUrl},#{retUrl},#{rootUrl},#{userId},#{bankUrl});
+    </insert>
+
+</mapper>
